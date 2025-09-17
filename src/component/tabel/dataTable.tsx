@@ -27,10 +27,6 @@ interface Props {
   data: dataTablePercanaan[];
 }
 
-export default function DataTable({ data }: Props) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
-
   const allColumns: ColumnDef<dataTablePercanaan>[] = [
     { id: "no", accessorFn: row => row.no, header: "No" },
     { id: "satdik", accessorFn: row => row.satdik, header: "Satuan Pendidikan" },
@@ -65,19 +61,27 @@ export default function DataTable({ data }: Props) {
     { id: "rekomendasi_pupr", accessorFn: row => row.rekomendasi_pupr, header: "Rekomendasi PUPR" },
     { id: "pagu", accessorFn: row => row.pagu, header: "Pagu", cell: info => info.getValue<number>().toLocaleString("id-ID") },
     { id: "realisasi", accessorFn: row => row.realisasi, header: "Realisasi", cell: info => info.getValue<number>().toLocaleString("id-ID") },
-  ];
+  ]
+
+export default function DataTable({ data }: Props) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
+
 
   // Filter kolom berdasarkan kategori_pengadaan
-  const columns = React.useMemo(() => {
-    if (data.length && data[0].kategori_pengadaan === "Barang") {
-      return allColumns.filter(col => [
-        "no","satdik","nama_pekerjaan","anggaran","jadwal_pengadaan","kategori_pengadaan",
-        "sirup","metode_pemilihan","kak","rab","hps_penetapan","hps_nilai","hasil_survei",
-        "rancangan_kontrak","hasil_pendampingan"
-      ].includes(col.id!));
-    }
-    return allColumns;
-  }, [data]);
+const columns = React.useMemo(() => {
+  if (data.length && data[0].kategori_pengadaan === "Barang") {
+    return allColumns.filter(col =>
+      [
+        "no", "satdik", "nama_pekerjaan", "anggaran", "jadwal_pengadaan", "kategori_pengadaan",
+        "sirup", "metode_pemilihan", "kak", "rab", "hps_penetapan", "hps_nilai", "hasil_survei",
+        "rancangan_kontrak", "hasil_pendampingan"
+      ].includes(col.id!)
+    );
+  }
+  return allColumns;
+}, [data]); // ✅ tambah allColumns
 
   const table = useReactTable({
     data,
@@ -87,10 +91,11 @@ export default function DataTable({ data }: Props) {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    globalFilterFn: (row, columnId, filterValue) => {
-      const value = row.getValue<any>(columnId);
-      return String(value).toLowerCase().includes(filterValue.toLowerCase());
-    },
+   globalFilterFn: (row, columnId, filterValue) => {
+  const value = row.getValue<unknown>(columnId);
+  return String(value ?? "").toLowerCase().includes(filterValue.toLowerCase());
+},
+
   });
 
   return (

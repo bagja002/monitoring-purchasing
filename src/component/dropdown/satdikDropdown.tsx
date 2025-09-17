@@ -8,10 +8,6 @@ interface Satdik {
   satuan_pendidikan: string;
 }
 
-type Satdiks = {
-
-}
-
 interface SelectSatdikProps {
     selectTedOption: (selectedId: number) => void;
     setNameSatdik: (selectedName: string) => void;

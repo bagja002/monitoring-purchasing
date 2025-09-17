@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Login Admin",
 };
 
-export default function (){
+export default function AdminSection(){
     return (
       <AdminLogin />
     )
