@@ -3,8 +3,13 @@ export interface perencaanKegiatan {
   id_satdik:string
   satdik: string;
   nama_pekerjaan: string;
+  sub_pekerjaan?:string
+  manajemen_risiko?:string  //Tinggi Rendahnya 
+  manajemen_risiko1?:string
+  manajemen_risiko2?:string
   anggaran: number;
   jadwal_pengadaan: string;
+  timeline?:string //file
   kategori_pengadaan: string;
   //Bagian Pengadaan Barang
   sirup_p_barang: string;
@@ -12,11 +17,11 @@ export interface perencaanKegiatan {
   justifikasi_pemilihan_p_barang: string;
   kak_p_barang: string;
   rab_p_barang: string;
-  hps_penetapan_p_barang: string;
+  hps_penetapan_p_barang: string;  //Ini adalah File 
   hps_nilai_p_barang: number;
   hasil_survei_p_barang: string;
-  rancangan_kontrak_p_barang: string;
-  hasil_pendampingan_p_barang: string;
+  rancangan_kontrak_p_barang: string;  //File 
+  hasil_pendampingan_p_barang: string;  //Isian String TeXt
 
     //Konsultan Pengawas
   sirup_p_konsultan_perencanaan: string;
@@ -35,7 +40,7 @@ export interface perencaanKegiatan {
   justifikasi_pemilihan_p_kontruksi: string;
   kak_p_kontruksi: string;
   rab_p_kontruksi: string;
-  gambar_perencanaan: string;
+  gambar_perencanaan: string;  //DED
   spesifikasi_teknis: string;
   rekomendasi_pupr: string;
   hps_penetapan_p_kontruksi: string;

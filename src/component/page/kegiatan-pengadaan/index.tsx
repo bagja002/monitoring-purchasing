@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import DataTablePembangunan from "@/component/tabel/dataTablePembangunan";
 import { perencaanKegiatan } from "@/component/interface/perencanaanInterface";
 import DataTablePembangunanRenovasi from "@/component/tabel/dataTableRenovAndBangun";
-
+import PaguAwal from "@/component/tabel/tableDataIdentifikasiPagu";
 
 interface DataItem {
   name: string; // Nama poltek / satdik
@@ -21,7 +21,7 @@ interface DataItem {
 
 export default function KegiatanPengadaanPage() {
   const [IdSatdik, setSelectedSatdikId] = useState<number>(0);
-   const router = useRouter();
+  const router = useRouter();
   const handleSatdikSelectSatdik = (id: string) => {
     // Save selected ID
     //
@@ -35,182 +35,181 @@ export default function KegiatanPengadaanPage() {
     router.push("/kegiatan-pengadaan/perencanaan/tambah"); // ganti dengan route halaman tambah
   };
 
+  const dummyPerencanaanKegiatan: perencaanKegiatan[] = [
+    {
+      id_perencanaan_kegiatan: "PK001",
+      id_satdik: "SAT001",
+      satdik: "Satuan Pendidikan 1",
+      nama_pekerjaan: "Pembangunan Gedung A",
+      anggaran: 150000000,
+      jadwal_pengadaan: "2025-09-20",
+      kategori_pengadaan: "Konsultan Perencanaan",
+      
 
-const dummyPerencanaanKegiatan: perencaanKegiatan[] = [
-  {
-    id_perencanaan_kegiatan: "PK001",
-    id_satdik: "SAT001",
-    satdik: "Satuan Pendidikan 1",
-    nama_pekerjaan: "Pembangunan Gedung A",
-    anggaran: 150000000,
-    jadwal_pengadaan: "2025-09-20",
-    kategori_pengadaan: "Konsultan Perencanaan",
-    
-    // Bagian Pengadaan Barang
-    sirup_p_barang: "SRP001",
-    metode_pemilihan_p_barang: "Tender",
-    justifikasi_pemilihan_p_barang: "Efisiensi",
-    kak_p_barang: "KAK001",
-    rab_p_barang: "RAB001",
-    hps_penetapan_p_barang: "HPS001",
-    hps_nilai_p_barang: 50000000,
-    hasil_survei_p_barang: "OK",
-    rancangan_kontrak_p_barang: "Kontrak001",
-    hasil_pendampingan_p_barang: "Selesai",
+      // Bagian Pengadaan Barang
+      sirup_p_barang: "SRP001",
+      metode_pemilihan_p_barang: "Tender",
+      justifikasi_pemilihan_p_barang: "Efisiensi",
+      kak_p_barang: "KAK001",
+      rab_p_barang: "RAB001",
+      hps_penetapan_p_barang: "HPS001",
+      hps_nilai_p_barang: 50000000,
+      hasil_survei_p_barang: "OK",
+      rancangan_kontrak_p_barang: "Kontrak001",
+      hasil_pendampingan_p_barang: "Selesai",
 
-    // Konsultan Perencanaan
-    sirup_p_konsultan_perencanaan: "SRP-KP001",
-    metode_pemilihan_p_konsultan_perencanaan: "Tender",
-    justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
-    kak_p_konsultan_perencanaan: "KAK-KP001",
-    rab_p_konsultan_perencanaan: "RAB-KP001",
-    hps_penetapan_p_konsultan_perencanaan: "HPS-KP001",
-    hps_nilai_p_konsultan_perencanaan: 70000000,
-    rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP001",
-    hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
+      // Konsultan Perencanaan
+      sirup_p_konsultan_perencanaan: "SRP-KP001",
+      metode_pemilihan_p_konsultan_perencanaan: "Tender",
+      justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
+      kak_p_konsultan_perencanaan: "KAK-KP001",
+      rab_p_konsultan_perencanaan: "RAB-KP001",
+      hps_penetapan_p_konsultan_perencanaan: "HPS-KP001",
+      hps_nilai_p_konsultan_perencanaan: 70000000,
+      rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP001",
+      hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
 
-    // Konstruksi
-    sirup_p_kontruksi: "SRP-KON001",
-    metode_pemilihan_p_kontruksi: "Tender",
-    justifikasi_pemilihan_p_kontruksi: "Harga",
-    kak_p_kontruksi: "KAK-KON001",
-    rab_p_kontruksi: "RAB-KON001",
-    gambar_perencanaan: "gambar1.png",
-    spesifikasi_teknis: "Spesifikasi A",
-    rekomendasi_pupr: "OK",
-    hps_penetapan_p_kontruksi: "HPS-KON001",
-    hps_nilai_p_kontruksi: 80000000,
-    rancangan_kontrak_p_kontruksi: "Kontrak-KON001",
-    hasil_pendampingan_p_kontruksi: "Selesai",
+      // Konstruksi
+      sirup_p_kontruksi: "SRP-KON001",
+      metode_pemilihan_p_kontruksi: "Tender",
+      justifikasi_pemilihan_p_kontruksi: "Harga",
+      kak_p_kontruksi: "KAK-KON001",
+      rab_p_kontruksi: "RAB-KON001",
+      gambar_perencanaan: "gambar1.png",
+      spesifikasi_teknis: "Spesifikasi A",
+      rekomendasi_pupr: "OK",
+      hps_penetapan_p_kontruksi: "HPS-KON001",
+      hps_nilai_p_kontruksi: 80000000,
+      rancangan_kontrak_p_kontruksi: "Kontrak-KON001",
+      hasil_pendampingan_p_kontruksi: "Selesai",
 
-    // Konsultan Pengawas
-    sirup_p_konsultan_pengawas: "SRP-KPWS001",
-    metode_pemilihan_p_konsultan_pengawas: "Tender",
-    justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
-    kak_p_konsultan_pengawas: "KAK-KPWS001",
-    rab_p_konsultan_pengawas: "RAB-KPWS001",
-    hps_uraian_p_konsultan_pengawas: "HPS-KPWS001",
-    hps_nilai_p_konsultan_pengawas: 30000000,
-    rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS001",
-    hasil_pendampingan_p_konsultan_pengawas: "Selesai",
+      // Konsultan Pengawas
+      sirup_p_konsultan_pengawas: "SRP-KPWS001",
+      metode_pemilihan_p_konsultan_pengawas: "Tender",
+      justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
+      kak_p_konsultan_pengawas: "KAK-KPWS001",
+      rab_p_konsultan_pengawas: "RAB-KPWS001",
+      hps_uraian_p_konsultan_pengawas: "HPS-KPWS001",
+      hps_nilai_p_konsultan_pengawas: 30000000,
+      rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS001",
+      hasil_pendampingan_p_konsultan_pengawas: "Selesai",
 
-    created_at: "2025-09-17T10:00:00Z",
-    update_at: "2025-09-17T10:00:00Z",
-  },
-  {
-    id_perencanaan_kegiatan: "PK002",
-    id_satdik: "SAT002",
-    satdik: "Satuan Pendidikan 2",
-    nama_pekerjaan: "Renovasi Lab B",
-    anggaran: 120000000,
-    jadwal_pengadaan: "2025-10-01",
-    kategori_pengadaan: "Konstruksi",
-    
-    sirup_p_barang: "SRP002",
-    metode_pemilihan_p_barang: "Tender",
-    justifikasi_pemilihan_p_barang: "Efisiensi",
-    kak_p_barang: "KAK002",
-    rab_p_barang: "RAB002",
-    hps_penetapan_p_barang: "HPS002",
-    hps_nilai_p_barang: 40000000,
-    hasil_survei_p_barang: "OK",
-    rancangan_kontrak_p_barang: "Kontrak002",
-    hasil_pendampingan_p_barang: "Selesai",
+      created_at: "2025-09-17T10:00:00Z",
+      update_at: "2025-09-17T10:00:00Z",
+    },
+    {
+      id_perencanaan_kegiatan: "PK002",
+      id_satdik: "SAT002",
+      satdik: "Satuan Pendidikan 2",
+      nama_pekerjaan: "Renovasi Lab B",
+      anggaran: 120000000,
+      jadwal_pengadaan: "2025-10-01",
+      kategori_pengadaan: "Konstruksi",
 
-    sirup_p_konsultan_perencanaan: "SRP-KP002",
-    metode_pemilihan_p_konsultan_perencanaan: "Tender",
-    justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
-    kak_p_konsultan_perencanaan: "KAK-KP002",
-    rab_p_konsultan_perencanaan: "RAB-KP002",
-    hps_penetapan_p_konsultan_perencanaan: "HPS-KP002",
-    hps_nilai_p_konsultan_perencanaan: 60000000,
-    rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP002",
-    hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
+      sirup_p_barang: "SRP002",
+      metode_pemilihan_p_barang: "Tender",
+      justifikasi_pemilihan_p_barang: "Efisiensi",
+      kak_p_barang: "KAK002",
+      rab_p_barang: "RAB002",
+      hps_penetapan_p_barang: "HPS002",
+      hps_nilai_p_barang: 40000000,
+      hasil_survei_p_barang: "OK",
+      rancangan_kontrak_p_barang: "Kontrak002",
+      hasil_pendampingan_p_barang: "Selesai",
 
-    sirup_p_kontruksi: "SRP-KON002",
-    metode_pemilihan_p_kontruksi: "Tender",
-    justifikasi_pemilihan_p_kontruksi: "Harga",
-    kak_p_kontruksi: "KAK-KON002",
-    rab_p_kontruksi: "RAB-KON002",
-    gambar_perencanaan: "gambar2.png",
-    spesifikasi_teknis: "Spesifikasi B",
-    rekomendasi_pupr: "OK",
-    hps_penetapan_p_kontruksi: "HPS-KON002",
-    hps_nilai_p_kontruksi: 90000000,
-    rancangan_kontrak_p_kontruksi: "Kontrak-KON002",
-    hasil_pendampingan_p_kontruksi: "Selesai",
+      sirup_p_konsultan_perencanaan: "SRP-KP002",
+      metode_pemilihan_p_konsultan_perencanaan: "Tender",
+      justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
+      kak_p_konsultan_perencanaan: "KAK-KP002",
+      rab_p_konsultan_perencanaan: "RAB-KP002",
+      hps_penetapan_p_konsultan_perencanaan: "HPS-KP002",
+      hps_nilai_p_konsultan_perencanaan: 60000000,
+      rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP002",
+      hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
 
-    sirup_p_konsultan_pengawas: "SRP-KPWS002",
-    metode_pemilihan_p_konsultan_pengawas: "Tender",
-    justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
-    kak_p_konsultan_pengawas: "KAK-KPWS002",
-    rab_p_konsultan_pengawas: "RAB-KPWS002",
-    hps_uraian_p_konsultan_pengawas: "HPS-KPWS002",
-    hps_nilai_p_konsultan_pengawas: 35000000,
-    rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS002",
-    hasil_pendampingan_p_konsultan_pengawas: "Selesai",
+      sirup_p_kontruksi: "SRP-KON002",
+      metode_pemilihan_p_kontruksi: "Tender",
+      justifikasi_pemilihan_p_kontruksi: "Harga",
+      kak_p_kontruksi: "KAK-KON002",
+      rab_p_kontruksi: "RAB-KON002",
+      gambar_perencanaan: "gambar2.png",
+      spesifikasi_teknis: "Spesifikasi B",
+      rekomendasi_pupr: "OK",
+      hps_penetapan_p_kontruksi: "HPS-KON002",
+      hps_nilai_p_kontruksi: 90000000,
+      rancangan_kontrak_p_kontruksi: "Kontrak-KON002",
+      hasil_pendampingan_p_kontruksi: "Selesai",
 
-    created_at: "2025-09-17T10:30:00Z",
-    update_at: "2025-09-17T10:30:00Z",
-  },
-  {
-    id_perencanaan_kegiatan: "PK003",
-    id_satdik: "SAT003",
-    satdik: "Satuan Pendidikan 3",
-    nama_pekerjaan: "Pembuatan Ruang Kelas C",
-    anggaran: 100000000,
-    jadwal_pengadaan: "2025-11-01",
-    kategori_pengadaan: "Konsultan Pengawas",
-    
-    sirup_p_barang: "SRP003",
-    metode_pemilihan_p_barang: "Tender",
-    justifikasi_pemilihan_p_barang: "Efisiensi",
-    kak_p_barang: "KAK003",
-    rab_p_barang: "RAB003",
-    hps_penetapan_p_barang: "HPS003",
-    hps_nilai_p_barang: 30000000,
-    hasil_survei_p_barang: "OK",
-    rancangan_kontrak_p_barang: "Kontrak003",
-    hasil_pendampingan_p_barang: "Selesai",
+      sirup_p_konsultan_pengawas: "SRP-KPWS002",
+      metode_pemilihan_p_konsultan_pengawas: "Tender",
+      justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
+      kak_p_konsultan_pengawas: "KAK-KPWS002",
+      rab_p_konsultan_pengawas: "RAB-KPWS002",
+      hps_uraian_p_konsultan_pengawas: "HPS-KPWS002",
+      hps_nilai_p_konsultan_pengawas: 35000000,
+      rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS002",
+      hasil_pendampingan_p_konsultan_pengawas: "Selesai",
 
-    sirup_p_konsultan_perencanaan: "SRP-KP003",
-    metode_pemilihan_p_konsultan_perencanaan: "Tender",
-    justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
-    kak_p_konsultan_perencanaan: "KAK-KP003",
-    rab_p_konsultan_perencanaan: "RAB-KP003",
-    hps_penetapan_p_konsultan_perencanaan: "HPS-KP003",
-    hps_nilai_p_konsultan_perencanaan: 50000000,
-    rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP003",
-    hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
+      created_at: "2025-09-17T10:30:00Z",
+      update_at: "2025-09-17T10:30:00Z",
+    },
+    {
+      id_perencanaan_kegiatan: "PK003",
+      id_satdik: "SAT003",
+      satdik: "Satuan Pendidikan 3",
+      nama_pekerjaan: "Pembuatan Ruang Kelas C",
+      anggaran: 100000000,
+      jadwal_pengadaan: "2025-11-01",
+      kategori_pengadaan: "Konsultan Pengawas",
 
-    sirup_p_kontruksi: "SRP-KON003",
-    metode_pemilihan_p_kontruksi: "Tender",
-    justifikasi_pemilihan_p_kontruksi: "Harga",
-    kak_p_kontruksi: "KAK-KON003",
-    rab_p_kontruksi: "RAB-KON003",
-    gambar_perencanaan: "gambar3.png",
-    spesifikasi_teknis: "Spesifikasi C",
-    rekomendasi_pupr: "OK",
-    hps_penetapan_p_kontruksi: "HPS-KON003",
-    hps_nilai_p_kontruksi: 70000000,
-    rancangan_kontrak_p_kontruksi: "Kontrak-KON003",
-    hasil_pendampingan_p_kontruksi: "Selesai",
+      sirup_p_barang: "SRP003",
+      metode_pemilihan_p_barang: "Tender",
+      justifikasi_pemilihan_p_barang: "Efisiensi",
+      kak_p_barang: "KAK003",
+      rab_p_barang: "RAB003",
+      hps_penetapan_p_barang: "HPS003",
+      hps_nilai_p_barang: 30000000,
+      hasil_survei_p_barang: "OK",
+      rancangan_kontrak_p_barang: "Kontrak003",
+      hasil_pendampingan_p_barang: "Selesai",
 
-    sirup_p_konsultan_pengawas: "SRP-KPWS003",
-    metode_pemilihan_p_konsultan_pengawas: "Tender",
-    justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
-    kak_p_konsultan_pengawas: "KAK-KPWS003",
-    rab_p_konsultan_pengawas: "RAB-KPWS003",
-    hps_uraian_p_konsultan_pengawas: "HPS-KPWS003",
-    hps_nilai_p_konsultan_pengawas: 25000000,
-    rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS003",
-    hasil_pendampingan_p_konsultan_pengawas: "Selesai",
+      sirup_p_konsultan_perencanaan: "SRP-KP003",
+      metode_pemilihan_p_konsultan_perencanaan: "Tender",
+      justifikasi_pemilihan_p_konsultan_perencanaan: "Kualitas",
+      kak_p_konsultan_perencanaan: "KAK-KP003",
+      rab_p_konsultan_perencanaan: "RAB-KP003",
+      hps_penetapan_p_konsultan_perencanaan: "HPS-KP003",
+      hps_nilai_p_konsultan_perencanaan: 50000000,
+      rancangan_kontrak_p_konsultan_perencanaan: "Kontrak-KP003",
+      hasil_pendampingan_p_konsultan_perencanaan: "Selesai",
 
-    created_at: "2025-09-17T11:00:00Z",
-    update_at: "2025-09-17T11:00:00Z",
-  },
-];
+      sirup_p_kontruksi: "SRP-KON003",
+      metode_pemilihan_p_kontruksi: "Tender",
+      justifikasi_pemilihan_p_kontruksi: "Harga",
+      kak_p_kontruksi: "KAK-KON003",
+      rab_p_kontruksi: "RAB-KON003",
+      gambar_perencanaan: "gambar3.png",
+      spesifikasi_teknis: "Spesifikasi C",
+      rekomendasi_pupr: "OK",
+      hps_penetapan_p_kontruksi: "HPS-KON003",
+      hps_nilai_p_kontruksi: 70000000,
+      rancangan_kontrak_p_kontruksi: "Kontrak-KON003",
+      hasil_pendampingan_p_kontruksi: "Selesai",
 
+      sirup_p_konsultan_pengawas: "SRP-KPWS003",
+      metode_pemilihan_p_konsultan_pengawas: "Tender",
+      justifikasi_pemilihan_p_konsultan_pengawas: "Efisiensi",
+      kak_p_konsultan_pengawas: "KAK-KPWS003",
+      rab_p_konsultan_pengawas: "RAB-KPWS003",
+      hps_uraian_p_konsultan_pengawas: "HPS-KPWS003",
+      hps_nilai_p_konsultan_pengawas: 25000000,
+      rancangan_kontrak_p_konsultan_pengawas: "Kontrak-KPWS003",
+      hasil_pendampingan_p_konsultan_pengawas: "Selesai",
+
+      created_at: "2025-09-17T11:00:00Z",
+      update_at: "2025-09-17T11:00:00Z",
+    },
+  ];
 
   const apiDataArray: dataTablePercanaan[] = [
     {
@@ -367,6 +366,13 @@ const dummyPerencanaanKegiatan: perencaanKegiatan[] = [
           />
         </div>
 
+        <div className="">
+          <div className="flex justify-center items-center w-full py-6">
+              <h2 className="text-xl font-semibold mb-4">Pagu Awal</h2>
+          </div>
+          <PaguAwal />
+        </div>
+
         <div className="flex justify-start mb-4">
           <button
             type="button"
@@ -393,7 +399,7 @@ const dummyPerencanaanKegiatan: perencaanKegiatan[] = [
 
           <section>
             <h2 className="text-lg font-semibold mb-2">
-              Pembangunan Gedung Baru
+              Pembangunan Gedung dan Bangunan
             </h2>
             <DataTablePembangunanRenovasi data={dummyPerencanaanKegiatan} />
           </section>

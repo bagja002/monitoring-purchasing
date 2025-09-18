@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       icon: User,
       children: [
         { id: "perencanaan", label: "Perencanaan", href: "/kegiatan-pengadaan/perencanaan" },
-        { id: "pengawasan", label: "Pengawasan", href: "/kegiatan-pengadaan/pengawasan" },
+        { id: "kegiatan", label: "Kegiatan", href: "/kegiatan-pengadaan/pengawasan" },
       ],
     },
     { id: "pengaturan", label: "Pengaturan", href: "#", icon: Settings },

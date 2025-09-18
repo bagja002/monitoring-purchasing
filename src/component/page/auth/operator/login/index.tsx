@@ -1,106 +1,183 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Eye, EyeOff, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import axios from 'axios';
+import { setCookie } from "cookies-next";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
-  const route = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = () => {
-    console.log('Login attempt:', { email, password });
-    route.push("/dashboard")
-    // Handle login logic here
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
+    // Basic validation
+    if (!email || !password) {
+      toast.error("Error", {
+        description: "Email dan password harus diisi",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    const baseUrl = "http://103.177.176.202:6402";
+    
+    try {
+      const response = await axios.post(`${baseUrl}/auth/login`, {
+        email: email,
+        password: password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 30000 // 30 seconds timeout
+      });
+
+      // Success response
+      if (response.data && response.data.token) {
+        // Save token to cookie with name XSX01 using cookies-next
+        setCookie('XSX01', response.data.token, { 
+          maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          httpOnly: false // Set to true if you want it to be httpOnly
+        });
+
+        toast.success("Login berhasil!", {
+          description: "Selamat datang kembali",
+        });
+
+        // Redirect to dashboard
+        router.push("/dashboard");
+      } else {
+        throw new Error('Token tidak ditemukan dalam response');
+      }
+
+    } catch (error) {
+      console.error('Login error:', error);
+      
+      let errorMessage = "Terjadi kesalahan saat login";
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const status = error.response.status;
+          switch (status) {
+            case 401:
+              errorMessage = "Email atau password salah";
+              break;
+            case 400:
+              errorMessage = "Data yang dikirim tidak valid";
+              break;
+            case 500:
+              errorMessage = "Server error. Coba lagi nanti";
+              break;
+            default:
+              errorMessage = error.response.data?.message || `Error ${status}`;
+          }
+        } else if (error.request) {
+          errorMessage = "Tidak dapat terhubung ke server. Periksa koneksi internet Anda";
+        } else {
+          errorMessage = error.message || "Terjadi kesalahan tidak terduga";
+        }
+      }
+
+      toast.error("Login gagal", {
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
- 
-
   return (
-    <div className="min-h-screen bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto relative">
-
-        {/* Modal Content */}
-        <div className="p-8 pt-12">
-          {/* Header */}
-            {/* Header */}
-          <div className="text-center mb-8">
-            <div className="mb-3">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-                Login E-Proc
-              </h1>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mt-1">
-                Operator Satdik Login
-              </h2>
-            </div>
-            <p className="text-gray-500 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto">
-              Sistem Monitoring Pengadaan Moderenisasi Sapras Pendidikan
-            </p>
-          </div>
-
-          {/* Form */}
-          <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md mx-auto shadow-lg">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Login E-Proc
+          </CardTitle>
+          <CardDescription className="text-lg font-semibold text-gray-700 mt-1">
+            Operator Satdik Login
+          </CardDescription>
+          <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto mt-2">
+            Sistem Monitoring Pengadaan Moderenisasi Sapras Pendidikan
+          </p>
+        </CardHeader>
+        
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
-            <div>
-              <label 
-                htmlFor="email" 
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email 
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="mail@mail.com"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-gray-700 placeholder-gray-400"
+                disabled={isLoading}
+                className="w-full"
               />
             </div>
 
             {/* Password Field */}
-            <div>
-              <label 
-                htmlFor="password" 
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Password
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="masukan password"
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-gray-700 placeholder-gray-400"
+                  disabled={isLoading}
+                  className="w-full pr-10"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  disabled={isLoading}
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Login Button */}
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 outline-none"
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
-              Login
-            </button>
-          </div>
-
-          {/* Additional Options */}
-         
-        </div>
-      </div>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
