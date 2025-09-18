@@ -37,7 +37,7 @@ const LoginForm: React.FC = () => {
     const baseUrl = "http://103.177.176.202:6402";
     
     try {
-      const response = await axios.post(`${baseUrl}/auth/login`, {
+      const response = await axios.post(`${baseUrl}/operator/login`, {
         email: email,
         password: password
       }, {
@@ -48,11 +48,11 @@ const LoginForm: React.FC = () => {
       });
 
       // Success response
-      if (response.data && response.data.token) {
+      if (response.data && response.data.t) {
         // Save token to cookie with name XSX01 using cookies-next
-        setCookie('XSX01', response.data.token, { 
-          maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-          secure: process.env.NODE_ENV === 'production',
+        setCookie('XSX01', response.data.t, { 
+          maxAge: 1 * 24 * 60 * 60, // 7 days in seconds
+          //secure: process.env.NODE_ENV === 'production',
           sameSite: 'strict',
           httpOnly: false // Set to true if you want it to be httpOnly
         });

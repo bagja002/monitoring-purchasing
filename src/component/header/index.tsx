@@ -1,19 +1,52 @@
+"use client";
+
 import Link from "next/link";
-//import DarkModeSwitcher from "./DarkModeSwitcher";
+import { useEffect, useState } from "react";
+import { getCookie } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 
-//import DropdownUser from "./DropdownUser";
-
-
-
+interface DecodedToken {
+  exp: number;
+  id_admin: string;
+  id_unit_kerja: string;
+  name: string;
+  role: string;
+  type: string;
+}
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
-  dataUsers? : string ;
-  Foto?:string
+  dataUsers?: string;
+  Foto?: string;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+  const [userName, setUserName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
 
-  
+  useEffect(() => {
+    try {
+      // Get token from cookie
+      const token = getCookie('XSX01');
+      
+      if (typeof token === "string" && token) {
+        // Decode token
+        const decoded = jwtDecode<DecodedToken>(token);
+        
+        // Set user data
+        setUserName(decoded.name);
+        setUserRole(decoded.type);
+        
+        console.log("Decoded token:", decoded);
+      } else {
+        console.log("No token found or token is not a string");
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      setUserName("Guest");
+      setUserRole("");
+    }
+  }, []);
+
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
       <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
@@ -60,24 +93,41 @@ const Header = (props: {
             </span>
           </button>
           {/* <!-- Hamburger Toggle BTN --> */}
-
-         
         </div>
 
         <div className="hidden sm:block">
-         
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+            Dashboard
+          </h2>
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-7">
           <ul className="flex items-center gap-2 2xsm:gap-4">
-         dasd
+            {/* User Info */}
+            <li className="flex items-center gap-2">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-800 dark:text-white">
+                  {userName || "Loading..."}
+                </p>
+                {userRole && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {userRole}
+                  </p>
+                )}
+              </div>
+              
+              {/* Avatar placeholder */}
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {userName ? userName.charAt(0).toUpperCase() : "U"}
+                </span>
+              </div>
+            </li>
+
             {/* <DarkModeSwitcher /> */}
-           
           </ul>
 
-          
           {/* <DropdownUser foto={props?.Foto} /> */}
-          dass
         </div>
       </div>
     </header>
