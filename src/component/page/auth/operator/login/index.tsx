@@ -13,9 +13,8 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = () => {
     console.log('Login attempt:', { email, password });
-    route.push("dashboard")
+    route.push("/dashboard")
     // Handle login logic here
-    alert(`Login attempt with email: ${email}`);
   };
 
  
