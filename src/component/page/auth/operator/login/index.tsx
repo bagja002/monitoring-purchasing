@@ -28,7 +28,7 @@ const LoginForm: React.FC = () => {
           <div className="text-center mb-8">
             <div className="mb-3">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-                Login E-Purchasing
+                Login E-Proc
               </h1>
               <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mt-1">
                 Operator Satdik Login
