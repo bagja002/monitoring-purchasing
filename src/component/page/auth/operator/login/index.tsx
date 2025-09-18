@@ -2,15 +2,18 @@
 
 import React, { useState } from 'react';
 import { Eye, EyeOff, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const route = useRouter()
 
   const handleSubmit = () => {
     console.log('Login attempt:', { email, password });
+    route.push("dashboard")
     // Handle login logic here
     alert(`Login attempt with email: ${email}`);
   };
