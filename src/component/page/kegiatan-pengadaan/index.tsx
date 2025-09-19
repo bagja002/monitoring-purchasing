@@ -1,125 +1,155 @@
 "use client";
-import SummaryCards from "@/component/card";
-import DynamicBarChart from "@/component/chart/grafikDashboard";
-import SelectSatdik from "@/component/dropdown/satdikDropdown";
-import { dataTablePercanaan } from "@/component/interface/dataTablePerencanaan";
-import Mainlayout from "@/component/layout";
-import DataTable from "@/component/tabel/dataTable";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import DataTablePembangunan from "@/component/tabel/dataTablePembangunan";
-import { perencaanKegiatan } from "@/component/interface/perencanaanInterface";
-import { PerencanaanKegiatanReal } from "@/component/interface/dataReal";
+import axios from "axios";
+import { getCookie } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
+
+import Mainlayout from "@/component/layout";
+import SelectSatdik from "@/component/dropdown/satdikDropdown";
+import DataTable from "@/component/tabel/dataTable";
 import DataTablePembangunanRenovasi from "@/component/tabel/dataTableRenovAndBangun";
 import PaguAwal from "@/component/tabel/tableDataIdentifikasiPagu";
-import axios from "axios";
+import { PerencanaanKegiatanReal } from "@/component/interface/dataReal";
 
-interface DataItem {
-  name: string; // Nama poltek / satdik
-  pagu: number; // Total pagu (misal: 3000000000)
-  realisasi: number; // Total realisasi (misal: 2500000000)
-  kegiatan?: number; // Optional: jumlah kegiatan
+interface DecodedToken {
+  exp: number;
+  id_admin: string;
+  id_unit_kerja: string;
+  name: string;
+  role: string;
+  type: string;
 }
 
+type KategoriKey = "pengadaan" | "revitalisasi" | "pembangunan";
+
+const kategoriConfig: Record<
+  KategoriKey,
+  { label: string; query: string; table: "default" | "renovasi" }
+> = {
+  pengadaan: {
+    label: "Pengadaan Barang",
+    query: "Pengadaan Barang",
+    table: "default",
+  },
+  revitalisasi: {
+    label: "Perbaikan Gedung dan Bangunan",
+    query: "Perbaikan Gedung dan Bangunan",
+    table: "renovasi",
+  },
+  pembangunan: {
+    label: "Pembangunan Gedung dan Bangunan Baru",
+    query: "Pembangunan Gedung Baru",
+    table: "renovasi",
+  },
+};
+
 export default function KegiatanPengadaanPage() {
-  const [IdSatdik, setSelectedSatdikId] = useState<number>(0);
   const router = useRouter();
+  const BASE_URL = "http://103.177.176.202:6402";
+
+  const [IdSatdik, setSelectedSatdikId] = useState<number>(0);
+  const [userRole, setUserRole] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [dataPengadaan, setDataPengadaan] = useState<PerencanaanKegiatanReal[]>(
-    []
+  const [data, setData] = useState<Record<KategoriKey, PerencanaanKegiatanReal[]>>({
+    pengadaan: [],
+    revitalisasi: [],
+    pembangunan: [],
+  });
+
+  // Decode token sekali di awal
+  useEffect(() => {
+    try {
+      const token = getCookie("XSX01");
+      if (typeof token === "string" && token) {
+        const decoded = jwtDecode<DecodedToken>(token);
+        setUserRole(decoded.type);
+        setSelectedSatdikId(Number(decoded.id_unit_kerja));
+      }
+    } catch (err) {
+      console.error("Error decoding token:", err);
+      setUserRole("");
+    }
+  }, []);
+
+  const fetchDataByKategori = useCallback(
+    async (kategori: string, selectedSatdikId: number) => {
+      const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
+      let queryParams = `kategory=${kategori}`;
+
+      if (selectedSatdikId && selectedSatdikId !== 0) {
+        queryParams += `&id_satdik=${selectedSatdikId}`;
+      }
+
+      const finalUrl = `${baseUrl}?${queryParams}`;
+      const response = await axios.get<PerencanaanKegiatanReal[]>(finalUrl);
+      return response.data;
+    },
+    [BASE_URL]
   );
 
-  const [dataRevitalisasi, setdataRevitalisasi] = useState<
-    PerencanaanKegiatanReal[]
-  >([]);
+  const fetchAllData = useCallback(async () => {
+    if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
 
-  const [dataPembangunan, setDataPembangunan] = useState<
-    PerencanaanKegiatanReal[]
-  >([]);
-
-  const BASE_URL = "http://103.177.176.202:6402";
-
-  const fetchDataByKategori = async (
-    kategori: string,
-    selectedSatdikId: number
-  ) => {
-    const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
-    let queryParams = `kategory=${kategori}`;
-
-    if (selectedSatdikId && selectedSatdikId !== 0) {
-      queryParams += `&id_satdik=${selectedSatdikId}`;
-    }
-
-    const finalUrl = `${baseUrl}?${queryParams}`;
-    const response = await axios.get<PerencanaanKegiatanReal[]>(finalUrl);
-    return response.data;
-  };
-
-  const fetchAllData = async () => {
     try {
       setLoading(true);
+      setError(null);
 
-      const [pengadaan, revitalisasi, pembangunan] = await Promise.all([
-        fetchDataByKategori("Pengadaan Barang", IdSatdik),
-        fetchDataByKategori("Perbaikan Gedung dan Bangunan", IdSatdik),
-        fetchDataByKategori("Pembangunan Gedung Baru", IdSatdik),
-      ]);
+      const results = await Promise.all(
+        (Object.entries(kategoriConfig) as [KategoriKey, typeof kategoriConfig[KategoriKey]][]).map(
+          async ([key, cfg]) => {
+            const res = await fetchDataByKategori(cfg.query, IdSatdik);
+            return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
+          }
+        )
+      );
 
-      setDataPengadaan(pengadaan);
-      console.log("data sama", pengadaan.length)
-      //
-    
-      setdataRevitalisasi(revitalisasi);
-      console.log("data sama", revitalisasi.length)
-      //
-      setDataPembangunan(pembangunan);
-      console.log("data sama", pembangunan.length)
-      //
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError("Gagal fetch data pengadaan");
+      setData(Object.fromEntries(results) as typeof data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError("Gagal memuat data kegiatan.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchDataByKategori, IdSatdik]);
 
   useEffect(() => {
     fetchAllData();
-  }, [IdSatdik]);
+  }, [fetchAllData]);
 
-  const handleSatdikSelectSatdik = (id: string) => {
-    // Save selected ID
-    //
-  };
   const handleSatdikSelect = (id: number) => {
-    setSelectedSatdikId(id); // Save selected ID
-    //
+    setSelectedSatdikId(id);
   };
 
   const handleClick = () => {
-    router.push("/kegiatan-pengadaan/perencanaan/tambah"); // ganti dengan route halaman tambah
+    router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
 
   return (
     <Mainlayout>
       <div className="space-y-6 p-4 text-black">
         {/* Dropdown Satdik */}
-        <div className="max-w-xs">
-          <SelectSatdik
-            selectTedOption={handleSatdikSelect}
-            setNameSatdik={handleSatdikSelectSatdik}
-          />
-        </div>
+        {userRole === "Admin Pusat" && (
+          <div className="max-w-xs">
+            <SelectSatdik
+              selectTedOption={handleSatdikSelect}
+              setNameSatdik={() => {}}
+            />
+          </div>
+        )}
 
-        <div className="">
+        {/* Pagu Awal */}
+        <div>
           <div className="flex justify-center items-center w-full py-6">
             <h2 className="text-xl font-semibold mb-4">Pagu Awal</h2>
           </div>
           <PaguAwal />
         </div>
 
+        {/* Button tambah */}
         <div className="flex justify-start mb-4">
           <button
             type="button"
@@ -130,29 +160,32 @@ export default function KegiatanPengadaanPage() {
           </button>
         </div>
 
-        {/* Kategori Tables */}
-        <div className="space-y-8">
-          <section>
-            <h2 className="text-lg font-semibold mb-2">Pengadaan Barang</h2>
-            <DataTable data={dataPengadaan} />
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold mb-2">
-              Perbaikan Gedung dan Bangunan
-            </h2>
-            <DataTablePembangunanRenovasi data={dataRevitalisasi} />
-          </section> 
-
-      
-
-          <section>
-            <h2 className="text-lg font-semibold mb-2">
-              Pembangunan Gedung dan Bangunan Baru
-            </h2>
-            <DataTablePembangunanRenovasi data={dataPembangunan} />
-          </section>
-        </div>
+        {/* Kondisi Data */}
+        {IdSatdik === 0 ? (
+          <p className="text-gray-500">Menunggu data satdik...</p>
+        ) : loading ? (
+          <p className="text-gray-500">Loading data...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : (
+          <div className="space-y-8">
+            {(
+              Object.entries(kategoriConfig) as [
+                KategoriKey,
+                typeof kategoriConfig[KategoriKey]
+              ][]
+            ).map(([key, cfg]) => (
+              <section key={key}>
+                <h2 className="text-lg font-semibold mb-2">{cfg.label}</h2>
+                {cfg.table === "default" ? (
+                  <DataTable data={data[key]} />
+                ) : (
+                  <DataTablePembangunanRenovasi data={data[key]} />
+                )}
+              </section>
+            ))}
+          </div>
+        )}
       </div>
     </Mainlayout>
   );
