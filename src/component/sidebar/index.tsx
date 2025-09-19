@@ -145,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Footer */}
         <div className="px-4 py-3 text-xs text-center text-gray-400">
-          © 2024 E-Proc
+          © 2024 EProc
         </div>
       </aside>
     </ClickOutside>

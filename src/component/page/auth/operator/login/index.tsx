@@ -108,7 +108,7 @@ const LoginForm: React.FC = () => {
       <Card className="w-full max-w-md mx-auto shadow-lg">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl font-bold text-gray-800">
-            Login E-Proc
+            Login EProc
           </CardTitle>
           <CardDescription className="text-lg font-semibold text-gray-700 mt-1">
             Operator Satdik Login
