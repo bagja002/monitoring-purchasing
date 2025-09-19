@@ -16,7 +16,7 @@ export default function DashboardPages() {
     //
   };
 
-  let userRole = "Admin"
+  // let userRole = "Admin"
 
   const apiDataArray = [
     { name: "poltek aup", pagu: 20, realisasi: 40 },
@@ -35,14 +35,14 @@ export default function DashboardPages() {
   return (
     <Mainlayout>
       <>
-        {userRole === "Admin Pusat" && (
+        {/* {userRole === "Admin Pusat" && (
           <div className="max-w-xs">
             <SelectSatdik
               selectTedOption={handleSatdikSelect}
               setNameSatdik={() => {}}
             />
           </div>
-        )}
+        )} */}
 
         {IdSatdik === 0 && <DynamicBarChart data={apiDataArray} />}
 
