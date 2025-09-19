@@ -22,6 +22,16 @@ import {
   useReactTable,
   Header,
 } from "@tanstack/react-table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";  
 import { dataTablePercanaan } from "../interface/dataTablePerencanaan";
 
 import ExcelJS from "exceljs";
@@ -29,6 +39,8 @@ import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
 import { perencaanKegiatan } from "../interface/perencanaanInterface";
 import { fileCell } from "../utils/getFile";
+import axios from "axios";
+
 
 interface PerencanaanKegiatanReal {
   id_perencanaan_kegiatan: number;
@@ -90,11 +102,12 @@ interface Props {
 }
 
 const allColumns = (
-  router: ReturnType<typeof useRouter>
+  router: ReturnType<typeof useRouter>,
+  onDelete: (id: string | number) => void
 ): ColumnDef<PerencanaanKegiatanReal, any>[] => [
   {
-    accessorKey: "no",
     header: "No",
+    cell: ({ row }) => row.index + 1, // row.index mulai dari 0
   },
   {
     accessorKey: "action",
@@ -113,7 +126,9 @@ const allColumns = (
         </button>
         <button
           className="bg-red-500 text-white px-2 py-1 rounded"
-          onClick={() => console.log(row.original)}
+      
+             onClick={() => onDelete(row.original.id_perencanaan_kegiatan)}
+     
         >
           Delete
         </button>
@@ -472,8 +487,17 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
+   const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+
   const router = useRouter();
-  const columns = React.useMemo(() => allColumns(router), [router]);
+  const columns = React.useMemo(
+    () => allColumns(router, (id: string | number) => {
+      setDeleteId(id);
+      setIsDeleteDialogOpen(true);
+    }),
+    [router]
+  );
 
   const table = useReactTable({
     data,
@@ -523,6 +547,30 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
 
     return h.column?.parent ? getHeaderGroupColor(h.column.parent) : "bg-white";
   };
+  
+const handleDeleteConfirm = async () => {
+  if (deleteId !== null) {
+    try {
+      const res = await axios.delete(
+        `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
+      );
+  
+      window.location.reload()
+    } catch (err) {
+      console.error("Gagal hapus:", err);
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteId(null);
+    }
+  }
+};
+
+
+
+    const handleDeleteCancel = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteId(null);
+  };
 
   return (
     <div className="space-y-4 max-w-[85vw] overflow-x-auto">
@@ -535,7 +583,7 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
           className="w-64"
         />
       </div>
-      <Button onClick={() => exportToExcel(table)}>Export Excel</Button>
+      {/* <Button onClick={() => exportToExcel(table)}>Export Excel</Button> */}
 
       <Table>
         <TableHeader>
@@ -606,6 +654,29 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
           Next
         </Button>
       </div>
+
+        {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

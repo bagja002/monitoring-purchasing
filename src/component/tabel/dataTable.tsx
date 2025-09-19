@@ -35,6 +35,7 @@ import { dataTablePercanaan } from "../interface/dataTablePerencanaan";
 import { PerencanaanKegiatanReal } from "../interface/dataReal";
 import { useRouter } from "next/navigation";
 import { fileCell } from "../utils/getFile";
+import axios from "axios";
 
 interface Props {
   data: PerencanaanKegiatanReal[];
@@ -44,7 +45,11 @@ const allColumns = (
   router: ReturnType<typeof useRouter>,
   onDelete: (id: string | number) => void
 ): ColumnDef<PerencanaanKegiatanReal, any>[] => [
-  { id: "no", accessorFn: (row) => row.id_perencanaan_kegiatan, header: "No" },
+  {
+    id:"no",
+    header: "No",
+    cell: ({ row }) => row.index + 1, // row.index mulai dari 0
+  },
   {
     id: "action",
     accessorKey: "action",
@@ -186,16 +191,22 @@ export default function DataTable({ data }: Props) {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    if (deleteId !== null) {
-      console.log("Deleting item with id:", deleteId);
-      // Add your delete logic here
-      // Example: await deletePerencanaanKegiatan(deleteId);
-      
+ const handleDeleteConfirm = async () => {
+  if (deleteId !== null) {
+    try {
+      const res = await axios.delete(
+        `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
+      );
+  
+      window.location.reload()
+    } catch (err) {
+      console.error("Gagal hapus:", err);
+    } finally {
       setIsDeleteDialogOpen(false);
       setDeleteId(null);
     }
-  };
+  }
+};
 
   const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
