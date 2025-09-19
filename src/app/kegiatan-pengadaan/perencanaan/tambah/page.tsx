@@ -16,8 +16,21 @@ import {
 import { toast } from "sonner";
 import Mainlayout from "@/component/layout";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
+import { getCookie } from "cookies-next";
+
+interface DecodedToken {
+  exp: number;
+  id_admin: string;
+  id_unit_kerja: string;
+  satdik:string
+  name: string;
+  role: string;
+  type: string;
+}
+
 
 interface PerencanaanKegiatan {
   IdPerencanaanKegiatan?: number;
@@ -95,9 +108,31 @@ interface PerencanaanKegiatan {
 export default function TambahKegiatanForm() {
   const router = useRouter();
   const [Loading, setLoading] = useState<boolean>(false);
-  const { register, handleSubmit, watch, control } =
+  const { register, setValue ,handleSubmit, watch, control } =
     useForm<PerencanaanKegiatan>();
   const kategori = watch("KategoriPengadaan");
+
+   useEffect(() => {
+      try {
+        // Get token from cookie
+        const token = getCookie('XSX01');
+        
+        if (typeof token === "string" && token) {
+          // Decode token
+          const decoded = jwtDecode<DecodedToken>(token);
+          
+          // Set user data
+           setValue("IdSatdik", Number(decoded.id_unit_kerja));
+           setValue("Satdik", decoded.satdik)
+          
+          console.log("Decoded token:", decoded);
+        } else {
+          console.log("No token found or token is not a string");
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error)
+      }
+    }, []);
 
   const onSubmit: SubmitHandler<PerencanaanKegiatan> = async (data) => {
     const formData = new FormData();
@@ -159,9 +194,14 @@ export default function TambahKegiatanForm() {
       <div className="mx-auto p-6 bg-white shadow rounded-lg">
         <h1 className="text-2xl font-bold mb-4">Tambah Rencana Pengadaan</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+           {/* IdSatdik field - hidden input */}
+      <input
+        type="hidden"
+        {...register("IdSatdik")}
+      />
           <div>
-            <Label className="mb-2">Satuan Pendidikan</Label>
-            <Input {...register("Satdik")} placeholder="Satuan Pendidikan" />
+            <Label className="mb-2">  Satuan Pendidikan</Label>
+            <Input readOnly  {...register("Satdik")} placeholder="Satuan Pendidikan" />
           </div>
 
           <div>
