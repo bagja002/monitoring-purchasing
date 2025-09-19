@@ -25,12 +25,11 @@ interface DecodedToken {
   exp: number;
   id_admin: string;
   id_unit_kerja: string;
-  satdik:string
+  satdik: string;
   name: string;
   role: string;
   type: string;
 }
-
 
 interface PerencanaanKegiatan {
   IdPerencanaanKegiatan?: number;
@@ -71,17 +70,17 @@ interface PerencanaanKegiatan {
 
   // Konstruksi
   SirupPKontruksi: FileList | string;
-  MetodePemilihanPKontruksi: string;
-  JustifikasiPemilihanPKontruksi: string;
-  KakPKontruksi: FileList | string;
-  RabPKontruksi: FileList | string;
+  MetodePemilihanPKonstruksi: string;
+  JustifikasiPemilihanPKonstruksi: string;
+  KakPKonstruksi: FileList | string;
+  RabPKonstruksi: FileList | string;
   GambarPerencanaan: FileList | string;
-  SpesifikasiTeknis: string;
-  RekomendasiPupr: FileList | string;
-  HpsPenetapanPKontruksi: FileList | string;
-  HpsNilaiPKontruksi: number;
-  RancanganKontrakPKontruksi: FileList | string;
-  HasilPendampinganPKontruksi: string;
+  SpesifikasiTeknis: FileList | string;
+  RekomendasiPUPR: FileList | string;
+  HpsPenetapanPKonstruksi: FileList | string;
+  HpsNilaiPKonstruksi: number;
+  RancanganKontrakPKonstruksi: FileList | string;
+  HasilPendampinganPKonstruksi: string;
 
   // Konsultan Pengawas
   SirupPKonsultanPengawas: FileList | string;
@@ -103,41 +102,56 @@ interface PerencanaanKegiatan {
   showSpkPengadaan?: boolean;
   showGambar?: boolean;
   showPupr?: boolean;
+
+  showKakPerencanaan?: boolean;
+  showHpsPenetapanPerencanaan?: boolean;
+  showRabPerencaan?: boolean;
+  showSpkPerencaan?: boolean;
+
+  showKakKonstruksi?: boolean;
+  showHpsPenetapanKonstruksi?: boolean;
+  showRabKonstruksi?: boolean;
+  showSpkKonstruksi?: boolean;
+
+  showKakPengawasan?: boolean;
+  showHpsPenetapanPengawasan?: boolean;
+  showRabPengawasan?: boolean;
+  showSpkPengawasan?: boolean;
 }
 
 export default function TambahKegiatanForm() {
   const router = useRouter();
   const [Loading, setLoading] = useState<boolean>(false);
-  const { register, setValue ,handleSubmit, watch, control } =
+  const { register, setValue, handleSubmit, watch, control } =
     useForm<PerencanaanKegiatan>();
   const kategori = watch("KategoriPengadaan");
 
-   useEffect(() => {
-      try {
-        // Get token from cookie
-        const token = getCookie('XSX01');
-        
-        if (typeof token === "string" && token) {
-          // Decode token
-          const decoded = jwtDecode<DecodedToken>(token);
-          
-          // Set user data
-           setValue("IdSatdik", Number(decoded.id_unit_kerja));
-           setValue("Satdik", decoded.satdik)
-          
-          console.log("Decoded token:", decoded);
-        } else {
-          console.log("No token found or token is not a string");
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error)
+  useEffect(() => {
+    try {
+      // Get token from cookie
+      const token = getCookie("XSX01");
+
+      if (typeof token === "string" && token) {
+        // Decode token
+        const decoded = jwtDecode<DecodedToken>(token);
+
+        // Set user data
+        setValue("IdSatdik", Number(decoded.id_unit_kerja));
+        setValue("Satdik", decoded.satdik);
+
+        console.log("Decoded token:", decoded);
+      } else {
+        console.log("No token found or token is not a string");
       }
-    }, [setValue]);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }, [setValue]);
 
   const onSubmit: SubmitHandler<PerencanaanKegiatan> = async (data) => {
     const formData = new FormData();
 
-    setLoading(true)
+    setLoading(true);
 
     const baseUrl = "http://103.177.176.202:6402";
     // Loop semua key di data
@@ -164,7 +178,7 @@ export default function TambahKegiatanForm() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
+      console.log(Response.data)
       toast.success("Data berhasil dikirim!", {
         description: "Perencanaan kegiatan telah tersimpan",
         duration: 4000,
@@ -177,9 +191,9 @@ export default function TambahKegiatanForm() {
         duration: 5000,
       });
     } finally {
-    // Always reset loading state
-    setLoading(false);
-  }
+      // Always reset loading state
+      setLoading(false);
+    }
   };
 
   const formatRupiah = (value: number) =>
@@ -194,14 +208,15 @@ export default function TambahKegiatanForm() {
       <div className="mx-auto p-6 bg-white shadow rounded-lg">
         <h1 className="text-2xl font-bold mb-4">Tambah Rencana Pengadaan</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-           {/* IdSatdik field - hidden input */}
-      <input
-        type="hidden"
-        {...register("IdSatdik")}
-      />
+          {/* IdSatdik field - hidden input */}
+          <input type="hidden" {...register("IdSatdik")} />
           <div>
-            <Label className="mb-2">  Satuan Pendidikan</Label>
-            <Input readOnly  {...register("Satdik")} placeholder="Satuan Pendidikan" />
+            <Label className="mb-2"> Satuan Pendidikan</Label>
+            <Input
+              readOnly
+              {...register("Satdik")}
+              placeholder="Satuan Pendidikan"
+            />
           </div>
 
           <div>
@@ -470,6 +485,573 @@ export default function TambahKegiatanForm() {
                   placeholder="Hasil Pendampingan"
                 />
               </div>
+            </>
+          )}
+          {["Perbaikan Gedung dan Bangunan", "Pembangunan Gedung Baru"].includes(kategori) && (
+            <>
+              <Accordion type="single" collapsible className="w-full">
+                {/* Konsultan Perencana */}
+                <AccordionItem value="konsultan_perencana">
+                  <AccordionTrigger>Konsultan Perencana</AccordionTrigger>
+                  <AccordionContent className="space-y-4">
+                    <div>
+                      <Label className="mb-2">SiRUP Konsultan Perencana</Label>
+                      <input
+                        type="file"
+                        {...register("SirupPKonsultanPerencanaan")}
+                        className="w-full p-2 border rounded"
+                        accept=".pdf,.doc,.docx"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Metode Pemilihan</Label>
+                      <select
+                        {...register("MetodePemilihanPKonsultanPerencanaan")}
+                        className="w-full p-2 border rounded"
+                      >
+                        <option value="">Pilih Metode Pemilihan</option>
+                        <option value="Tender Terbuka">Tender Terbuka</option>
+                        <option value="Tender Terbatas">Tender Terbatas</option>
+                        <option value="Penunjukan Langsung">
+                          Penunjukan Langsung
+                        </option>
+                        <option value="Pengadaan Langsung">
+                          Pengadaan Langsung
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Justifikasi Pemilihan</Label>
+                      <Textarea
+                        {...register(
+                          "JustifikasiPemilihanPKonsultanPerencanaan"
+                        )}
+                        placeholder="Justifikasi Pemilihan Konsultan Perencana"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showKakPerencanaan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>KAK</span>
+                        </label>
+
+                        {watch("showKakPerencanaan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload KAK</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register("KakPKonsultanPerencanaan")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showRabPerencaan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>RAB</span>
+                        </label>
+
+                        {watch("showRabPerencaan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload RAB</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("RabPKonsultanPerencanaan")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showSpkPerencaan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>Rancangan Kontrak/SPK</span>
+                        </label>
+
+                        {watch("showSpkPerencaan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">
+                              Upload Rancangan Kontrak/SPK
+                            </Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register(
+                                "RancanganKontrakPKonsultanPerencanaan"
+                              )}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showHpsPenetapanPerencanaan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>HPS Penetapan</span>
+                        </label>
+
+                        {watch("showHpsPenetapanPerencanaan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload HPS Penetapan</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("HpsPenetapanPKonsultanPerencanaan")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">HPS Nilai</Label>
+                      <Controller
+                        name="HpsNilaiPKonsultanPerencanaan"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            placeholder="HPS Nilai Konsultan Perencana"
+                            value={field.value ? formatRupiah(field.value) : ""}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, "");
+                              const parsed = raw ? parseInt(raw, 10) : 0;
+                              field.onChange(parsed);
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Hasil Pendampingan</Label>
+                      <Textarea
+                        {...register("HasilPendampinganPKonsultanPerencanaan")}
+                        placeholder="Hasil Pendampingan Konsultan Perencana"
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Konstruksi */}
+                <AccordionItem value="konstruksi">
+                  <AccordionTrigger>Konstruksi</AccordionTrigger>
+                  <AccordionContent className="space-y-4">
+                    <div>
+                      <Label className="mb-2">SiRUP Konstruksi</Label>
+                      <input
+                        type="file"
+                        {...register("SirupPKontruksi")}
+                        className="w-full p-2 border rounded"
+                        accept=".pdf,.doc,.docx"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Metode Pemilihan</Label>
+                      <select
+                        {...register("MetodePemilihanPKonstruksi")}
+                        className="w-full p-2 border rounded"
+                      >
+                        <option value="">Pilih Metode Pemilihan</option>
+                        <option value="Tender Terbuka">Tender Terbuka</option>
+                        <option value="Tender Terbatas">Tender Terbatas</option>
+                        <option value="Penunjukan Langsung">
+                          Penunjukan Langsung
+                        </option>
+                        <option value="Pengadaan Langsung">
+                          Pengadaan Langsung
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Justifikasi Pemilihan</Label>
+                      <Textarea
+                        {...register("JustifikasiPemilihanPKonstruksi")}
+                        placeholder="Justifikasi Pemilihan Konstruksi"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Spesifikasi Teknis</Label>
+                      <Textarea
+                        {...register("SpesifikasiTeknis")}
+                        placeholder="Spesifikasi Teknis"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showKakKonstruksi")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>KAK</span>
+                        </label>
+
+                        {watch("showKakKonstruksi") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload KAK</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register("KakPKonstruksi")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showRabKonstruksi")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>RAB</span>
+                        </label>
+
+                        {watch("showRabKonstruksi") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload RAB</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("RabPKonstruksi")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showSpkKonstruksi")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>Rancangan Kontrak/SPK</span>
+                        </label>
+
+                        {watch("showSpkKonstruksi") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">
+                              Upload Rancangan Kontrak/SPK
+                            </Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register("RancanganKontrakPKonstruksi")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showHpsPenetapanKonstruksi")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>HPS Penetapan</span>
+                        </label>
+
+                        {watch("showHpsPenetapanKonstruksi") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload HPS Penetapan</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("HpsPenetapanPKonstruksi")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showGambar")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>Gambar Perencanaan</span>
+                        </label>
+
+                        {watch("showGambar") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">
+                              Upload Gambar Perencanaan/DED
+                            </Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.jpg,.jpeg,.png,.dwg"
+                              {...register("GambarPerencanaan")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showPupr")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>Rekomendasi PUPR</span>
+                        </label>
+
+                        {watch("showPupr") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">
+                              Upload Rekomendasi PUPR
+                            </Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register("RekomendasiPUPR")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">HPS Nilai</Label>
+                      <Controller
+                        name="HpsNilaiPKonstruksi"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            placeholder="HPS Nilai Konstruksi"
+                            value={field.value ? formatRupiah(field.value) : ""}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, "");
+                              const parsed = raw ? parseInt(raw, 10) : 0;
+                              field.onChange(parsed);
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Hasil Pendampingan</Label>
+                      <Textarea
+                        {...register("HasilPendampinganPKonstruksi")}
+                        placeholder="Hasil Pendampingan Konstruksi"
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Konsultan Pengawas */}
+                <AccordionItem value="konsultan_pengawas">
+                  <AccordionTrigger>Konsultan Pengawas</AccordionTrigger>
+                  <AccordionContent className="space-y-4">
+                    <div>
+                      <Label className="mb-2">SiRUP Konsultan Pengawas</Label>
+                      <input
+                        type="file"
+                        {...register("SirupPKonsultanPengawas")}
+                        className="w-full p-2 border rounded"
+                        accept=".pdf,.doc,.docx"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Metode Pemilihan</Label>
+                      <select
+                        {...register("MetodePemilihanPKonsultanPengawas")}
+                        className="w-full p-2 border rounded"
+                      >
+                        <option value="">Pilih Metode Pemilihan</option>
+                        <option value="Tender Terbuka">Tender Terbuka</option>
+                        <option value="Tender Terbatas">Tender Terbatas</option>
+                        <option value="Penunjukan Langsung">
+                          Penunjukan Langsung
+                        </option>
+                        <option value="Pengadaan Langsung">
+                          Pengadaan Langsung
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Justifikasi Pemilihan</Label>
+                      <Textarea
+                        {...register("JustifikasiPemilihanPKonsultanPengawas")}
+                        placeholder="Justifikasi Pemilihan Konsultan Pengawas"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showKakPengawasan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>KAK</span>
+                        </label>
+
+                        {watch("showKakPengawasan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload KAK</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register("KakPKonsultanPengawas")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showRabPengawasan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>RAB</span>
+                        </label>
+
+                        {watch("showRabPengawasan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload RAB</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("RabPKonsultanPengawas")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showSpkPengawasan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>Rancangan Kontrak/SPK</span>
+                        </label>
+
+                        {watch("showSpkPengawasan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">
+                              Upload Rancangan Kontrak/SPK
+                            </Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              {...register(
+                                "RancanganKontrakPKonsultanPengawas"
+                              )}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("showHpsPenetapanPengawasan")}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <span>HPS Uraian</span>
+                        </label>
+
+                        {watch("showHpsPenetapanPengawasan") && (
+                          <div className="mt-2">
+                            <Label className="mb-2">Upload HPS Uraian</Label>
+                            <input
+                              type="file"
+                              accept=".pdf,.xls,.xlsx"
+                              {...register("HpsUraianPKonsultanPengawas")}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">HPS Nilai</Label>
+                      <Controller
+                        name="HpsNilaiPKonsultanPengawas"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            placeholder="HPS Nilai Konsultan Pengawas"
+                            value={field.value ? formatRupiah(field.value) : ""}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, "");
+                              const parsed = raw ? parseInt(raw, 10) : 0;
+                              field.onChange(parsed);
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="mb-2">Hasil Pendampingan</Label>
+                      <Textarea
+                        {...register("HasilPendampinganPKonsultanPengawas")}
+                        placeholder="Hasil Pendampingan Konsultan Pengawas"
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </>
           )}
 

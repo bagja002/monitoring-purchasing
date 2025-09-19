@@ -28,14 +28,70 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
 import { perencaanKegiatan } from "../interface/perencanaanInterface";
+import { fileCell } from "../utils/getFile";
 
-interface Props {
-  data: perencaanKegiatan[];
+interface PerencanaanKegiatanReal {
+  id_perencanaan_kegiatan: number;
+  id_satdik: number;
+  satdik: string;
+  nama_pekerjaan: string;
+  ManajemenResiko: string;
+  ManajemenResikoFile1: string;
+  ManajemenResikoFile2: string;
+  anggaran: number;
+  jadwal_pengadaan: string;
+  kategori_pengadaan: string;
+  sirup_p_barang: string;
+  metode_pemilihan_p_barang: string;
+  justifikasi_pemilihan_p_barang: string;
+  kak_p_barang: string;
+  rab_p_barang: string;
+  hps_penetapan_p_barang: string;
+  hps_nilai_p_barang: number;
+  hasil_survei_p_barang: string;
+  rancangan_kontrak_p_barang: string;
+  hasil_pendampingan_p_barang: string;
+  sirup_p_konsultan_perencanaan: string;
+  metode_pemilihan_p_konsultan_perencanaan: string;
+  justifikasi_pemilihan_p_konsultan_perencanaan: string;
+  kak_p_konsultan_perencanaan: string;
+  rab_p_konsultan_perencanaan: string;
+  hps_penetapan_p_konsultan_perencanaan: string;
+  hps_nilai_p_konsultan_perencanaan: string;
+  rancangan_kontrak_p_konsultan_perencanaan: string;
+  hasil_pendampingan_p_konsultan_perencanaan: string;
+  sirup_p_kontruksi: string;
+  metode_pemilihan_p_kontruksi: string;
+  justifikasi_pemilihan_p_kontruksi: string;
+  kak_p_kontruksi: string;
+  rab_p_kontruksi: string;
+  gambar_perencanaan: string;
+  spesifikasi_teknis: string;
+  rekomendasi_pupr: string;
+  hps_penetapan_p_kontruksi: string;
+  hps_nilai_p_kontruksi: string;
+  rancangan_kontrak_p_kontruksi: string;
+  hasil_pendampingan_p_kontruksi: string;
+  sirup_p_konsultan_pengawas: string;
+  metode_pemilihan_p_konsultan_pengawas: string;
+  justifikasi_pemilihan_p_konsultan_pengawas: string;
+  kak_p_konsultan_pengawas: string;
+  rab_p_konsultan_pengawas: string;
+  hps_uraian_p_konsultan_pengawas: string;
+  hps_nilai_p_konsultan_pengawas: string;
+  rancangan_kontrak_p_konsultan_pengawas: string;
+  hasil_pendampingan_p_konsultan_pengawas: string;
+  created_at: string;
+  update_at: string;
 }
 
-export const allColumns = (
+interface Props {
+  data: PerencanaanKegiatanReal[];
+}
+
+const allColumns = (
   router: ReturnType<typeof useRouter>
-): ColumnDef<perencaanKegiatan, any>[] => [
+): ColumnDef<PerencanaanKegiatanReal, any>[] => [
   {
     accessorKey: "no",
     header: "No",
@@ -48,7 +104,9 @@ export const allColumns = (
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
           onClick={() =>
-            router.push(`perencanaan/edit/${row.original.anggaran}`)
+            router.push(
+              `perencanaan/edit/${row.original.id_perencanaan_kegiatan}`
+            )
           }
         >
           Edit
@@ -62,7 +120,6 @@ export const allColumns = (
       </div>
     ),
   },
-
   {
     accessorKey: "satdik",
     header: "Satuan Pendidikan",
@@ -80,47 +137,65 @@ export const allColumns = (
         currency: "IDR",
       }),
   },
+
+  // ================== Konsultan Perencana ==================
   {
     header: "Konsultan Perencana",
     columns: [
       {
-        accessorKey: "sirup",
+        accessorKey: "sirup_p_konsultan_perencanaan",
         header: "SiRUP",
       },
       {
+        id: "metode_justifikasi_konsultan_perencana", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
         accessorFn: (row) =>
-          `${row.metode_pemilihan_p_konsultan_perencanaan} - ${row.metode_pemilihan_p_konsultan_perencanaan}`,
+          `${row.metode_pemilihan_p_konsultan_perencanaan} - ${row.justifikasi_pemilihan_p_konsultan_perencanaan}`,
       },
+
       {
-        accessorKey: "kak_p_konsultan_perencanaan",
+        id: "kak_p_konsultan_perencanaan",
+        accessorFn: (row) => row.kak_p_konsultan_perencanaan,
         header: "KAK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
-        accessorKey: "rab_p_konsultan_perencanaan",
+        id: "rab_p_konsultan_perencanaan",
+        accessorFn: (row) => row.rab_p_konsultan_perencanaan,
         header: "RAB",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
         header: "HPS",
         columns: [
           {
-            accessorKey: "hps_penetapan_p_konsultan_perencanaan",
-            header: "Penetapan",
+            id: "hps_penetapan_p_konsultan_perencanaan",
+            accessorFn: (row) => row.hps_penetapan_p_konsultan_perencanaan,
+            header: "HPS Penetapan",
+            cell: ({ getValue }) => fileCell(getValue()),
           },
           {
             accessorKey: "hps_nilai_p_konsultan_perencanaan",
             header: "Nilai",
-            cell: (info) =>
-              info.getValue<number>()?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }),
+            cell: (info) => {
+              const rawValue = info.getValue<string>();
+              const numValue = Number(rawValue);
+
+              return !isNaN(numValue)
+                ? numValue.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })
+                : "-";
+            },
           },
         ],
       },
       {
-        accessorKey: "rancangan_kontrak_p_konsultan_perencanaan",
+        id: "rancangan_kontrak_p_konsultan_perencanaan",
+        accessorFn: (row) => row.rancangan_kontrak_p_konsultan_perencanaan,
         header: "Rancangan Kontrak/SPK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
         accessorKey: "hasil_pendampingan_p_konsultan_perencanaan",
@@ -128,6 +203,8 @@ export const allColumns = (
       },
     ],
   },
+
+  // ================== Konstruksi ==================
   {
     header: "Konstruksi",
     columns: [
@@ -136,41 +213,75 @@ export const allColumns = (
         header: "SiRUP",
       },
       {
-        header: "Metode Pemilihan & Justifikasis",
+        id: "metode_justifikasi_konstruksi", // <== id unik
+        header: "Metode Pemilihan & Justifikasi",
         accessorFn: (row) =>
           `${row.metode_pemilihan_p_kontruksi} - ${row.justifikasi_pemilihan_p_kontruksi}`,
       },
       {
-        accessorKey: "kak_p_kontruksi",
+        id: "kak_p_kontruksi",
+        accessorFn: (row) => row.kak_p_kontruksi,
         header: "KAK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
-        accessorKey: "rab_p_kontruksi",
+        id: "rab_p_kontruksi",
+        accessorFn: (row) => row.rab_p_kontruksi,
         header: "RAB",
+        cell: ({ getValue }) => fileCell(getValue()),
+      },
+      {
+        id: "gambar_perencanaan",
+        accessorFn: (row) => row.gambar_perencanaan,
+        header: "Gambar Perencaan / DED",
+        cell: ({ getValue }) => fileCell(getValue()),
+      },
+      {
+        id: "spesifikasi_teknis",
+        accessorFn: (row) => row.spesifikasi_teknis,
+        header: "Spesifikasi Teknis",
+        cell: ({ getValue }) => fileCell(getValue()),
+      },
+      {
+        id: "rekomendasi_pupr",
+        accessorFn: (row) => row.rekomendasi_pupr,
+        header: "Rekomendasi PUPR",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
         header: "HPS",
         columns: [
           {
-            accessorKey: "hps_penetapan_p_kontruksi",
-            header: "Penetapan",
+            id: "hps_penetapan_p_kontruksi",
+            accessorFn: (row) => row.hps_penetapan_p_kontruksi,
+            header: "HPS Penetapan",
+            cell: ({ getValue }) => fileCell(getValue()),
           },
+
           {
             accessorKey: "hps_nilai_p_kontruksi",
             header: "Nilai",
-            cell: (info) =>
-              info.getValue<number>()?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }),
+            cell: (info) => {
+              const rawValue = info.getValue<string>();
+              const numValue = Number(rawValue);
+
+              return !isNaN(numValue)
+                ? numValue.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })
+                : "-";
+            },
           },
         ],
       },
-
       {
-        accessorKey: "rancangan_kontrak_p_kontruksi",
+        id: "rancangan_kontrak_p_kontruksi",
+        accessorFn: (row) => row.rancangan_kontrak_p_kontruksi,
         header: "Rancangan Kontrak/SPK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
+
       {
         accessorKey: "hasil_pendampingan_p_kontruksi",
         header: "Hasil Pendampingan",
@@ -178,6 +289,7 @@ export const allColumns = (
     ],
   },
 
+  // ================== Konsultan Pengawas ==================
   {
     header: "Konsultan Pengawas",
     columns: [
@@ -186,41 +298,59 @@ export const allColumns = (
         header: "SiRUP",
       },
       {
-        header: "Metode Pemilihan & Justifikasiss",
+        id: "metode_justifikasi_konsultan_pengawas", // <== id unik
+        header: "Metode Pemilihan & Justifikasi",
         accessorFn: (row) =>
           `${row.metode_pemilihan_p_konsultan_pengawas} - ${row.justifikasi_pemilihan_p_konsultan_pengawas}`,
       },
       {
-        accessorKey: "kak_p_konsultan_pengawas",
+        id: "kak_p_konsultan_pengawas",
+        accessorFn: (row) => row.kak_p_konsultan_pengawas,
         header: "KAK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
-        accessorKey: "rab_p_konsultan_pengawas",
+        id: "rab_p_konsultan_pengawas",
+        accessorFn: (row) => row.rab_p_konsultan_pengawas,
         header: "RAB",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
       {
         header: "HPS",
         columns: [
           {
-            accessorKey: "hps_uraian_p_konsultan_pengawas",
+            id: "hps_uraian_p_konsultan_pengawas",
+            accessorFn: (row) => row.hps_uraian_p_konsultan_pengawas,
             header: "Penetapan",
+            cell: ({ getValue }) => fileCell(getValue()),
           },
+
           {
             accessorKey: "hps_nilai_p_konsultan_pengawas",
             header: "Nilai",
-            cell: (info) =>
-              info.getValue<number>()?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }),
+            cell: (info) => {
+              const rawValue = info.getValue<string>();
+              const numValue = Number(
+                rawValue?.replace(/\./g, "").replace(",", ".")
+              );
+
+              return !isNaN(numValue)
+                ? numValue.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })
+                : "-";
+            },
           },
         ],
       },
-
       {
-        accessorKey: "rancangan_kontrak_p_konsultan_pengawas",
-        header: "Rancangan Kontrak/SPK",
+        id: "rancangan_kontrak_p_konsultan_pengawas",
+        accessorFn: (row) => row.rancangan_kontrak_p_konsultan_pengawas,
+        header: "Rancangan Kontrak / SPK",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
+
       {
         accessorKey: "hasil_pendampingan_p_konsultan_pengawas",
         header: "Hasil Pendampingan",

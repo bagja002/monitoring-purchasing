@@ -54,7 +54,7 @@ const allColumns = (
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
           onClick={() =>
-            router.push(`perencanaan/edit/${row.original.anggaran}`)
+            router.push(`perencanaan/edit/${row.original.id_perencanaan_kegiatan}`)
           }
         >
           Edit

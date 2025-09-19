@@ -28,6 +28,7 @@ export interface PerencanaanKegiatanReal {
   hps_nilai_p_konsultan_perencanaan: string;
   rancangan_kontrak_p_konsultan_perencanaan: string;
   hasil_pendampingan_p_konsultan_perencanaan: string;
+  
   sirup_p_kontruksi: string;
   metode_pemilihan_p_kontruksi: string;
   justifikasi_pemilihan_p_kontruksi: string;

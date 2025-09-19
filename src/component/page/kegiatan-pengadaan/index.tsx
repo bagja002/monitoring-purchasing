@@ -31,40 +31,63 @@ export default function KegiatanPengadaanPage() {
     []
   );
 
+  const [dataRevitalisasi, setdataRevitalisasi] = useState<
+    PerencanaanKegiatanReal[]
+  >([]);
+
+  const [dataPembangunan, setDataPembangunan] = useState<
+    PerencanaanKegiatanReal[]
+  >([]);
+
   const BASE_URL = "http://103.177.176.202:6402";
 
-  const fetchPengadaan = async (
-  kategori: string,
-  selectedSatdikId: number
-) => {
-  try {
-    setLoading(true);
-
+  const fetchDataByKategori = async (
+    kategori: string,
+    selectedSatdikId: number
+  ) => {
     const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
     let queryParams = `kategory=${kategori}`;
 
-
-    // filter satdik dari dropdown
-    if (selectedSatdikId !== 0) {
+    if (selectedSatdikId && selectedSatdikId !== 0) {
       queryParams += `&id_satdik=${selectedSatdikId}`;
     }
 
     const finalUrl = `${baseUrl}?${queryParams}`;
-
     const response = await axios.get<PerencanaanKegiatanReal[]>(finalUrl);
+    return response.data;
+  };
 
-    setDataPengadaan(response.data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setError("Gagal fetch data pengadaan");
-  } finally {
-    setLoading(false);
-  }
-};
-useEffect(() => {
-  fetchPengadaan("Pengadaan Barang", IdSatdik);
-}, [IdSatdik]);
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
 
+      const [pengadaan, revitalisasi, pembangunan] = await Promise.all([
+        fetchDataByKategori("Pengadaan Barang", IdSatdik),
+        fetchDataByKategori("Perbaikan Gedung dan Bangunan", IdSatdik),
+        fetchDataByKategori("Pembangunan Gedung Baru", IdSatdik),
+      ]);
+
+      setDataPengadaan(pengadaan);
+      console.log("data sama", pengadaan.length)
+      //
+    
+      setdataRevitalisasi(revitalisasi);
+      console.log("data sama", revitalisasi.length)
+      //
+      setDataPembangunan(pembangunan);
+      console.log("data sama", pembangunan.length)
+      //
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Gagal fetch data pengadaan");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, [IdSatdik]);
 
   const handleSatdikSelectSatdik = (id: string) => {
     // Save selected ID
@@ -114,19 +137,21 @@ useEffect(() => {
             <DataTable data={dataPengadaan} />
           </section>
 
-          {/* <section>
+          <section>
             <h2 className="text-lg font-semibold mb-2">
               Perbaikan Gedung dan Bangunan
             </h2>
-            <DataTablePembangunan data={apiKKonstruksi} />
-          </section>
+            <DataTablePembangunanRenovasi data={dataRevitalisasi} />
+          </section> 
+
+      
 
           <section>
             <h2 className="text-lg font-semibold mb-2">
-              Pembangunan Gedung dan Bangunan
+              Pembangunan Gedung dan Bangunan Baru
             </h2>
-            <DataTablePembangunanRenovasi data={dummyPerencanaanKegiatan} />
-          </section> */}
+            <DataTablePembangunanRenovasi data={dataPembangunan} />
+          </section>
         </div>
       </div>
     </Mainlayout>
