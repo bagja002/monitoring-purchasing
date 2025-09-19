@@ -132,7 +132,7 @@ export default function TambahKegiatanForm() {
       } catch (error) {
         console.error("Error decoding token:", error)
       }
-    }, []);
+    }, [setValue]);
 
   const onSubmit: SubmitHandler<PerencanaanKegiatan> = async (data) => {
     const formData = new FormData();

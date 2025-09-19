@@ -40,7 +40,7 @@ export default function KegiatanPengadaanPage() {
   try {
     setLoading(true);
 
-    let baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
+    const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
     let queryParams = `kategory=${kategori}`;
 
 
