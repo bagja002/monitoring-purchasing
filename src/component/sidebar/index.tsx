@@ -1,6 +1,14 @@
 "use client";
 
-import { Home, User, Settings, LogOut, LucideIcon, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Home,
+  User,
+  Settings,
+  LogOut,
+  LucideIcon,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ClickOutside from "../utils/ClickOutside";
@@ -21,25 +29,33 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
-  const pathname = usePathname(); // dapatin path sekarang
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
+  const pathname = usePathname();
+  const [openMenu, setOpenMenu] = React.useState<string | null>(null);
 
   const toggleMenu = (id: string) => {
-    setOpenMenus(prev => ({ ...prev, [id]: !prev[id] }));
+    setOpenMenu(prev => (prev === id ? null : id)); // Accordion style
   };
 
   const mainMenuItems: MenuItem[] = [
     { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: Home },
     {
-      id: "kegiatan",
+      id: "kegiatan-main",
       label: "Kegiatan Pengadaan",
       icon: User,
       children: [
-        { id: "perencanaan", label: "Perencanaan", href: "/kegiatan-pengadaan/perencanaan" },
-        { id: "kegiatan", label: "Pengawasan", href: "/kegiatan-pengadaan/pengawasan" },
+        {
+          id: "perencanaan",
+          label: "Perencanaan",
+          href: "/kegiatan-pengadaan/perencanaan",
+        },
+        {
+          id: "pengawasan",
+          label: "Pengawasan",
+          href: "/kegiatan-pengadaan/pengawasan",
+        },
       ],
     },
-    { id: "pengaturan", label: "Pengaturan", href: "#", icon: Settings },
+    { id: "pengaturan", label: "Pengaturan", href: "/pengaturan", icon: Settings },
   ];
 
   const bottomMenuItems: MenuItem[] = [
@@ -50,9 +66,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     const Icon = item.icon;
     const isDanger = item.type === "danger";
     const hasChildren = item.children && item.children.length > 0;
-    const isOpen = openMenus[item.id];
+    const isOpen = openMenu === item.id;
 
-    // Cek apakah menu aktif
     const isActive =
       item.href === pathname ||
       (hasChildren && item.children!.some(child => child.href === pathname));
@@ -72,32 +87,46 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             style={{ marginLeft: level * 16 }}
           >
             <div className="flex items-center gap-3">
-              {Icon && <Icon size={20} className={isActive ? "text-blue-700" : "text-gray-500"} />}
+              {Icon && (
+                <Icon
+                  size={20}
+                  className={isActive ? "text-blue-700" : "text-gray-500"}
+                />
+              )}
               <span>{item.label}</span>
             </div>
-            {hasChildren && (isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
           </Link>
         ) : (
           <button
             onClick={() => toggleMenu(item.id)}
+            aria-expanded={isOpen}
             className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg font-medium transition-colors ${
-              isActive ? "bg-blue-100 text-blue-700" : "text-gray-700 hover:bg-gray-50"
+              isActive
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
             style={{ marginLeft: level * 16 }}
           >
             <div className="flex items-center gap-3">
-              {Icon && <Icon size={20} className={isActive ? "text-blue-700" : "text-gray-500"} />}
+              {Icon && (
+                <Icon
+                  size={20}
+                  className={isActive ? "text-blue-700" : "text-gray-500"}
+                />
+              )}
               <span>{item.label}</span>
             </div>
-            {hasChildren && (isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+            {hasChildren &&
+              (isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
           </button>
         )}
 
         {/* Sub-menu animasi */}
         {hasChildren && (
           <div
-            className={`overflow-hidden transition-[height] duration-300`}
-            style={{ height: isOpen ? `${item.children!.length * 40}px` : "0px" }}
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isOpen ? "max-h-40" : "max-h-0"
+            }`}
           >
             {item.children!.map(child => renderMenuItem(child, level + 1))}
           </div>
@@ -125,12 +154,10 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
               width="20"
               height="18"
               viewBox="0 0 20 18"
-              fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 d="M19 8.175H2.98748L9.36248 1.6875C9.69998 1.35 9.69998 0.825 9.36248 0.4875C9.02498 0.15 8.49998 0.15 8.16248 0.4875L0.399976 8.3625C0.0624756 8.7 0.0624756 9.225 0.399976 9.5625L8.16248 17.4375C8.31248 17.5875 8.53748 17.7 8.76248 17.7C8.98748 17.7 9.17498 17.625 9.36248 17.475C9.69998 17.1375 9.69998 16.6125 9.36248 16.275L3.02498 9.8625H19C19.45 9.8625 19.825 9.4875 19.825 9.0375C19.825 8.55 19.45 8.175 19 8.175Z"
-                fill=""
               />
             </svg>
           </button>

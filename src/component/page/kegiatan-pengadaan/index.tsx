@@ -128,7 +128,8 @@ export default function KegiatanPengadaanPage() {
     router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
 
-  return (
+
+return (
     <Mainlayout>
       <div className="space-y-6 p-4 text-black">
         {/* Dropdown Satdik */}
@@ -160,14 +161,12 @@ export default function KegiatanPengadaanPage() {
           </button>
         </div>
 
-        {/* Kondisi Data */}
-        {IdSatdik === 0 ? (
-          <p className="text-gray-500">Menunggu data satdik...</p>
-        ) : loading ? (
-          <p className="text-gray-500">Loading data...</p>
-        ) : error ? (
-          <p className="text-red-600">{error}</p>
-        ) : (
+        {/* Loading & Error state */}
+        {loading && <p className="text-gray-500">Loading data...</p>}
+        {error && <p className="text-red-600">{error}</p>}
+
+        {/* Data sections */}
+        {!loading && !error && (
           <div className="space-y-8">
             {(
               Object.entries(kategoriConfig) as [
@@ -189,4 +188,5 @@ export default function KegiatanPengadaanPage() {
       </div>
     </Mainlayout>
   );
+
 }

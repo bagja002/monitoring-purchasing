@@ -183,6 +183,7 @@ export default function TambahKegiatanForm() {
         description: "Perencanaan kegiatan telah tersimpan",
         duration: 4000,
       });
+      router.push("/kegiatan-pengadaan/perencanaan")
     } catch (error) {
       // Toast error
       toast.error("Gagal mengirim data!", {

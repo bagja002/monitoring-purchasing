@@ -168,7 +168,7 @@ export default function TableComponent() {
   )
 
   return (
-    <div className="rounded-2xl border shadow-sm p-2 overflow-x-auto">
+    <div className="rounded-2xl border shadow-sm p-2 space-y-4 max-w-[78vw] overflow-x-auto">
          
       <Table>
         <TableHeader>

@@ -143,6 +143,11 @@ const allColumns = (
     accessorKey: "nama_pekerjaan",
     header: "Nama Pekerjaan",
   },
+   {
+    accessorKey: "manajemen_resiko",
+    header: "Manajemen Resiko",
+  },
+  
   {
     accessorKey: "anggaran",
     header: "Anggaran",
@@ -152,15 +157,28 @@ const allColumns = (
         currency: "IDR",
       }),
   },
+     {
+    accessorKey: "jadwal_pengadaan",
+    header: "Jadwal Pengadaan",
+  },
+ {
+        id: "time_line",
+        accessorKey: "time_line",
+        header: "Time Line",
+        cell: ({ getValue }) => fileCell(getValue()),
+      },
 
   // ================== Konsultan Perencana ==================
   {
     header: "Konsultan Perencana",
     columns: [
       {
-        accessorKey: "sirup_p_konsultan_perencanaan",
-        header: "SiRUP",
+        id: "sirup_p_konsultan_perencanaan",
+        accessorFn: (row) => row.sirup_p_konsultan_perencanaan,
+        header: "SIRUP",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
+     
       {
         id: "metode_justifikasi_konsultan_perencana", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -223,10 +241,14 @@ const allColumns = (
   {
     header: "Konstruksi",
     columns: [
-      {
-        accessorKey: "sirup_p_kontruksi",
-        header: "SiRUP",
+       {
+        id: "sirup_p_kontruksi",
+        accessorFn: (row) => row.sirup_p_kontruksi,
+        header: "SIRUP",
+        cell: ({ getValue }) => fileCell(getValue()),
       },
+     
+     
       {
         id: "metode_justifikasi_konstruksi", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -309,9 +331,12 @@ const allColumns = (
     header: "Konsultan Pengawas",
     columns: [
       {
-        accessorKey: "sirup_p_konsultan_pengawas",
-        header: "SiRUP",
+        id: "sirup_p_konsultan_pengawas",
+        accessorFn: (row) => row.sirup_p_konsultan_pengawas,
+        header: "SIRUP",  
+        cell: ({ getValue }) => fileCell(getValue()),
       },
+     
       {
         id: "metode_justifikasi_konsultan_pengawas", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -573,7 +598,7 @@ const handleDeleteConfirm = async () => {
   };
 
   return (
-    <div className="space-y-4 max-w-[85vw] overflow-x-auto">
+    <div className="space-y-4 max-w-[78vw] overflow-x-auto">
       {/* Search */}
       <div className="flex justify-end mb-2">
         <Input
