@@ -695,9 +695,9 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
           Ganti `namaPekerjaan` dan `satdikName` sesuai variable di component mu.
           Contoh: selected?.nama_pekerjaan dan selected?.satdik
         */}
-              Apakah Anda yakin ingin menghapus pekerjaan{" "}
-              <strong className="font-medium">"{namaPekerjaan}"</strong> pada{" "}
-              <strong className="font-medium">"{namaSatdik}"</strong>? Tindakan
+              Apakah Anda yakin ingin menghapus pekerjaan
+              <strong className="font-medium">{namaPekerjaan}</strong> pada
+              <strong className="font-medium">{namaSatdik}</strong>? Tindakan
               ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>

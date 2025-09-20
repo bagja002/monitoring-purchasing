@@ -184,12 +184,11 @@ export default function DataTable({ data }: Props) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-
-  // Handle delete confirmation
-  const handleDeleteClick = (id: string | number) => {
-    setDeleteId(id);
-    setIsDeleteDialogOpen(true);
-  };
+// Handle delete confirmation
+const handleDeleteClick = React.useCallback((id: string | number) => {
+  setDeleteId(id);
+  setIsDeleteDialogOpen(true);
+}, []);
 
  const handleDeleteConfirm = async () => {
   if (deleteId !== null) {

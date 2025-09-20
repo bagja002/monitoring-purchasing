@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Mainlayout from "@/component/layout";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Loader2, FileText, Download, Eye } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import { getCookie } from "cookies-next";
@@ -132,62 +132,15 @@ const FilePreview = ({
     window.open(fullUrl, "_blank");
   };
 
-  const handleDownload = async () => {
-  try {
-    // coba fetch file (bisa gagal karena CORS)
-    const res = await fetch(fullUrl, {
-      method: "GET",
-      // jika butuh cookie/auth, uncomment:
-      // credentials: 'include'
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    // ambil filename dari header kalau tersedia
-    const cd = res.headers.get("Content-Disposition");
-    const headerMatch = cd && /filename\*=UTF-8''([^;]+)|filename=\"?([^\";]+)\"?/i.exec(cd);
-    const headerName = headerMatch ? decodeURIComponent(headerMatch[1] || headerMatch[2]) : null;
-
-    // fallback ambil nama dari URL atau props
-    const urlName = (() => {
-      try {
-        const u = new URL(fullUrl);
-        const parts = u.pathname.split("/").filter(Boolean);
-        return parts.length ? parts[parts.length - 1] : null;
-      } catch {
-        const parts = fullUrl.split("/").filter(Boolean);
-        return parts.length ? parts[parts.length - 1] : null;
-      }
-    })();
-
-    const finalName = fileName || headerName || urlName || "download";
-
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = finalName;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    // release object URL sedikit delay biar browser sempet pakai
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
-  } catch (err) {
-    // fallback: buka di tab baru (aman, tapi browser yang handle download)
-    console.warn("Download fetch failed — fallback open new tab:", err);
-    const a = document.createElement("a");
-    a.href = fullUrl;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-};
-
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = fullUrl;
+    link.download = fileName || "download";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
@@ -252,7 +205,8 @@ export default function EditKegiatanForm() {
     console.log(existingFiles);
   }, [setValue, existingFiles]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!id) return; // safety
     try {
       const res = await axios.get(
         `${baseUrl}/operator/getRencanaPengadaanByid?id=${id}`
@@ -432,12 +386,12 @@ export default function EditKegiatanForm() {
       console.error("Gagal fetch data:", err);
       toast.error("Gagal memuat data untuk update");
     }
-  };
+  }, [id, reset]);
 
   useEffect(() => {
-    if (!id) return;
+    
     fetchData();
-  }, [id, reset]);
+  }, [fetchData]);
 
   const onSubmit: SubmitHandler<PerencanaanKegiatan> = async (data) => {
     if (!id) {
