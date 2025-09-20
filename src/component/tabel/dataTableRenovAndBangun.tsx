@@ -31,7 +31,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";  
+} from "@/components/ui/alert-dialog";
 import { dataTablePercanaan } from "../interface/dataTablePerencanaan";
 
 import ExcelJS from "exceljs";
@@ -40,7 +40,6 @@ import { useRouter } from "next/navigation";
 import { perencaanKegiatan } from "../interface/perencanaanInterface";
 import { fileCell } from "../utils/getFile";
 import axios from "axios";
-
 
 interface PerencanaanKegiatanReal {
   id_perencanaan_kegiatan: number;
@@ -103,7 +102,9 @@ interface Props {
 
 const allColumns = (
   router: ReturnType<typeof useRouter>,
-  onDelete: (id: string | number) => void
+  onDelete: (id: string | number) => void,
+  setNamaSatdik: (satdik: string) => void,
+  setNamaPekerjaan: (pekerjaan: string) => void
 ): ColumnDef<PerencanaanKegiatanReal, any>[] => [
   {
     header: "No",
@@ -116,19 +117,20 @@ const allColumns = (
       <div className="flex gap-2">
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
-          onClick={() =>
+          onClick={() => {
             router.push(
               `perencanaan/edit/${row.original.id_perencanaan_kegiatan}`
-            )
-          }
+            );
+          }}
         >
           Edit
         </button>
         <button
           className="bg-red-500 text-white px-2 py-1 rounded"
-      
-             onClick={() => onDelete(row.original.id_perencanaan_kegiatan)}
-     
+          onClick={() => {
+              setNamaSatdik(row.original.satdik);
+            setNamaPekerjaan(row.original.nama_pekerjaan);
+            onDelete(row.original.id_perencanaan_kegiatan)}}
         >
           Delete
         </button>
@@ -143,11 +145,11 @@ const allColumns = (
     accessorKey: "nama_pekerjaan",
     header: "Nama Pekerjaan",
   },
-   {
+  {
     accessorKey: "manajemen_resiko",
     header: "Manajemen Resiko",
   },
-  
+
   {
     accessorKey: "anggaran",
     header: "Anggaran",
@@ -157,16 +159,16 @@ const allColumns = (
         currency: "IDR",
       }),
   },
-     {
+  {
     accessorKey: "jadwal_pengadaan",
     header: "Jadwal Pengadaan",
   },
- {
-        id: "time_line",
-        accessorKey: "time_line",
-        header: "Time Line",
-        cell: ({ getValue }) => fileCell(getValue()),
-      },
+  {
+    id: "time_line",
+    accessorKey: "time_line",
+    header: "Time Line",
+    cell: ({ getValue }) => fileCell(getValue()),
+  },
 
   // ================== Konsultan Perencana ==================
   {
@@ -178,7 +180,7 @@ const allColumns = (
         header: "SIRUP",
         cell: ({ getValue }) => fileCell(getValue()),
       },
-     
+
       {
         id: "metode_justifikasi_konsultan_perencana", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -241,14 +243,13 @@ const allColumns = (
   {
     header: "Konstruksi",
     columns: [
-       {
+      {
         id: "sirup_p_kontruksi",
         accessorFn: (row) => row.sirup_p_kontruksi,
         header: "SIRUP",
         cell: ({ getValue }) => fileCell(getValue()),
       },
-     
-     
+
       {
         id: "metode_justifikasi_konstruksi", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -333,10 +334,10 @@ const allColumns = (
       {
         id: "sirup_p_konsultan_pengawas",
         accessorFn: (row) => row.sirup_p_konsultan_pengawas,
-        header: "SIRUP",  
+        header: "SIRUP",
         cell: ({ getValue }) => fileCell(getValue()),
       },
-     
+
       {
         id: "metode_justifikasi_konsultan_pengawas", // <== id unik
         header: "Metode Pemilihan & Justifikasi",
@@ -512,17 +513,20 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-   const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-
+  const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [namaSatdik, setNamaSatdik] = React.useState<string | number | null>(null);
+  const [namaPekerjaan, setNamaPekerjaan] = React.useState<string | number | null>(null);
   const router = useRouter();
   const columns = React.useMemo(
-    () => allColumns(router, (id: string | number) => {
-      setDeleteId(id);
-      setIsDeleteDialogOpen(true);
-    }),
+    () =>
+      allColumns(router, (id: string | number) => {
+        setDeleteId(id);
+        setIsDeleteDialogOpen(true);
+      }, setNamaSatdik, setNamaPekerjaan),
     [router]
   );
+  
 
   const table = useReactTable({
     data,
@@ -572,27 +576,25 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
 
     return h.column?.parent ? getHeaderGroupColor(h.column.parent) : "bg-white";
   };
-  
-const handleDeleteConfirm = async () => {
-  if (deleteId !== null) {
-    try {
-      const res = await axios.delete(
-        `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
-      );
-  
-      window.location.reload()
-    } catch (err) {
-      console.error("Gagal hapus:", err);
-    } finally {
-      setIsDeleteDialogOpen(false);
-      setDeleteId(null);
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId !== null) {
+      try {
+        const res = await axios.delete(
+          `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
+        );
+
+        window.location.reload();
+      } catch (err) {
+        console.error("Gagal hapus:", err);
+      } finally {
+        setIsDeleteDialogOpen(false);
+        setDeleteId(null);
+      }
     }
-  }
-};
+  };
 
-
-
-    const handleDeleteCancel = () => {
+  const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
     setDeleteId(null);
   };
@@ -680,20 +682,30 @@ const handleDeleteConfirm = async () => {
         </Button>
       </div>
 
-        {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+              {/*
+          Ganti `namaPekerjaan` dan `satdikName` sesuai variable di component mu.
+          Contoh: selected?.nama_pekerjaan dan selected?.satdik
+        */}
+              Apakah Anda yakin ingin menghapus pekerjaan{" "}
+              <strong className="font-medium">"{namaPekerjaan}"</strong> pada{" "}
+              <strong className="font-medium">"{namaSatdik}"</strong>? Tindakan
+              ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleDeleteCancel}>
               Batal
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-red-600 hover:bg-red-700"
             >
