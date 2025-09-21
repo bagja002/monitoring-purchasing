@@ -44,7 +44,7 @@ export interface PerencanaanKegiatanReal {
   sirup_p_konsultan_pengawas: string;
   metode_pemilihan_p_konsultan_pengawas: string;
   justifikasi_pemilihan_p_konsultan_pengawas: string;
-  kak_p_konsultan_pengawas: string;
+  kak_p_konsultan_pengawas: string
   rab_p_konsultan_pengawas: string;
   hps_uraian_p_konsultan_pengawas: string;
   hps_nilai_p_konsultan_pengawas: string;
@@ -53,3 +53,28 @@ export interface PerencanaanKegiatanReal {
   created_at: string;
   update_at: string;
 }
+
+
+
+
+  export interface LaporanMingguan {
+
+    minggu: string;
+    target_fisik_perminggu: string; // persen
+    minggu_fisik:string
+    realisasi_fisik_perminggu: string; // persen
+    deviasi: string;
+
+    target_realisasi_anggaran_per_termin: string;
+    reaisasi_per_termin: string;
+    sisa_kontrak: string;
+
+    tingkat_capaiannya_keberhasilan: string;
+    tindak_lanjut_rekomendasi_sebelumnya: string;
+    permasalahan: string;
+    rekomendasi: string;
+
+  }
+
+
+//jadi data di table itu adalah laporan mingguan yang di join ke pelaksaan dan perencaan kegauatan.  

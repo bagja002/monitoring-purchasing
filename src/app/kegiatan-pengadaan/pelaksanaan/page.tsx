@@ -1,20 +1,18 @@
 import LoginForm from "@/component/page/auth/operator/login";
 import DashboardPages from "@/component/page/dashboard";
 import KegiatanPengadaanPage from "@/component/page/kegiatan-pengadaan";
+import KegiatanPelaksananPage from "@/component/page/kegiatan-pengadaan/pengawasan";
 import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "Pengawasan",
-  description: "Pengawasan Page",
+  title: "Pelaksaan",
+  description: "Pelaksaan Page",
 };
 
 
-export default function Perencanaan(){
+export default function Pelaksaan(){
     return (
-        <>
-                
-
-        </>
+        <KegiatanPelaksananPage />
     )
 }

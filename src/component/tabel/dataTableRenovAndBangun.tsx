@@ -100,6 +100,7 @@ interface Props {
   data: PerencanaanKegiatanReal[];
 }
 
+
 const allColumns = (
   router: ReturnType<typeof useRouter>,
   onDelete: (id: string | number) => void,
@@ -115,6 +116,16 @@ const allColumns = (
     header: "Action",
     cell: ({ row }) => (
       <div className="flex gap-2">
+         <button
+          className="bg-green-500 text-white px-2 py-1 rounded"
+          onClick={() => {
+            router.push(
+              `/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan-pembangunan/${row.original.id_perencanaan_kegiatan}`
+            );
+          }}
+        >
+          View Pelaksanaan
+        </button>
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
           onClick={() => {

@@ -57,6 +57,14 @@ const allColumns = (
     cell: ({ row }) => (
       <div className="flex gap-2">
         <button
+          className="bg-green-500 text-white px-2 py-1 rounded"
+          onClick={() =>
+            router.push(`/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan/${row.original.id_perencanaan_kegiatan}`)
+          }
+        >
+          View Pelaksanaan
+        </button>
+        <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
           onClick={() =>
             router.push(`perencanaan/edit/${row.original.id_perencanaan_kegiatan}`)
@@ -221,6 +229,7 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
         [
           "no",
           "action",
+         
           "satdik",
           "nama_pekerjaan",
           "anggaran",

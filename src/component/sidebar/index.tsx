@@ -49,13 +49,13 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           href: "/kegiatan-pengadaan/perencanaan",
         },
         {
-          id: "pengawasan",
-          label: "Pengawasan",
-          href: "/kegiatan-pengadaan/pengawasan",
+          id: "pelaksanaan",
+          label: "Pelaksanaan",
+          href: "/kegiatan-pengadaan/pelaksanaan",
         },
       ],
     },
-    { id: "pengaturan", label: "Pengaturan", href: "/pengaturan", icon: Settings },
+    //{ id: "pengaturan", label: "Pengaturan", href: "/pengaturan", icon: Settings },
   ];
 
   const bottomMenuItems: MenuItem[] = [

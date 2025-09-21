@@ -1,0 +1,37 @@
+interface DataPengawasan {
+  id_pengawasan :number
+  satuan_pendidikan : number  //dari API
+  nama_pekerjaan : number     //dari API
+  kategori_pengadaan: string;    //dari API
+  lokasi_kerja :string    // Input 
+  link_cctv:string      //inut 
+  nama_penyedia_alamat_dan_npwp :string     //input  
+  nomor_tanggal_kontrak_dan_spmk:string     //input 
+  tanggal_kontrak_berakhir:string           //input
+  lama_pekerjaan:string                     //input 
+
+  anggaran:string   //dari API 
+  hps:string        // dari API
+  nilai_kontrak:string   //isi langsing
+  sisa_pagu:string  //anggaran - nilai kontrak 
+
+  
+}
+
+
+interface LaporanMingguan {
+  minggu:string 
+  target_fisik_perminggu : string //isi persen 
+  realisasi_fisik_perminggu : string //isi persen 
+  deviasi:string 
+
+  target_realisasi_anggaran_per_termin :string 
+  reaisasi_per_termin:string 
+  sisa_kontrak:string
+
+
+  tingkat_capaiannya_keberhasilan:string
+  tindak_lanjut_rekomendasi_sebelumnya :string
+  permasalahan:string
+  rekomendasi :string
+}
