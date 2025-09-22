@@ -1,18 +1,25 @@
 interface SummaryProps {
-  pagu: number;
-  realisasi: number;
-  kegiatan: number;
+  pagu_definitip;
+  pagu_efektif;
+  realisasi_anggaran: number;
+  realisasi_fisik: number;
 }
 
 const SummaryCards: React.FC<SummaryProps> = ({
-  pagu,
-  realisasi,
-  kegiatan,
+  pagu_definitip,
+  pagu_efektif,
+  realisasi_anggaran,
+  realisasi_fisik,
 }) => {
   const cardData = [
-    { title: "Pagu", value: pagu, color: "text-yellow-500" },
-    { title: "Realisasi", value: realisasi, color: "text-blue-500" },
-    { title: "Kegiatan", value: kegiatan, color: "text-green-500" },
+    {
+      title: "Pagu Definitip",
+      value: pagu_definitip,
+      color: "text-yellow-500",
+    },
+    { title: "Pagu Efektif", value: pagu_efektif, color: "text-yellow-500" },
+    { title: "Realisasi Anggaran", value: realisasi_anggaran, color: "text-blue-500" },
+    { title: "Realisasi Fisik", value: realisasi_fisik, color: "text-green-500" },
   ];
 
   return (

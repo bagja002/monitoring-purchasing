@@ -3,6 +3,7 @@ import SummaryCards from "@/component/card";
 import DynamicBarChart from "@/component/chart/grafikDashboard";
 import SelectSatdik from "@/component/dropdown/satdikDropdown";
 import Mainlayout from "@/component/layout";
+import TabelDashboard from "@/component/tabel/TableDashboardPerencaan";
 import { useState } from "react";
 
 export default function DashboardPages() {
@@ -18,20 +19,6 @@ export default function DashboardPages() {
 
   // let userRole = "Admin"
 
-  const apiDataArray = [
-    { name: "poltek aup", pagu: 20, realisasi: 40 },
-    { name: "poltek lain", pagu: 50, realisasi: 35 },
-    { name: "poltek tiga", pagu: 20, realisasi: 25 },
-    { name: "poltek aup", pagu: 30, realisasi: 40 },
-    { name: "poltek lain", pagu: 50, realisasi: 35 },
-    { name: "poltek tiga", pagu: 20, realisasi: 25 },
-    { name: "poltek aup", pagu: 30, realisasi: 40 },
-    { name: "poltek lain", pagu: 50, realisasi: 35 },
-    { name: "poltek tiga", pagu: 20, realisasi: 25 },
-    { name: "poltek aup", pagu: 30, realisasi: 40 },
-    { name: "poltek lain", pagu: 50, realisasi: 35 },
-    { name: "poltek tiga", pagu: 20, realisasi: 25 },
-  ];
   return (
     <Mainlayout>
       <>
@@ -44,16 +31,20 @@ export default function DashboardPages() {
           </div>
         )} */}
 
-        {IdSatdik === 0 && <DynamicBarChart data={apiDataArray} />}
+        {/* {IdSatdik === 0 && <DynamicBarChart data={apiDataArray} />} */}
 
         {/* Grafik Grafik Realisasi */}
         <div className="flex flex-col justify-between mt-10">
           <SummaryCards
-            pagu={30000000000000}
-            realisasi={30000000000000}
-            kegiatan={2}
+            pagu_definitip={30000000000000}
+            pagu_efektif={30000000000000}
+            realisasi_anggaran={30000000000000}
+            realisasi_fisik={1 }
           />
         </div>
+
+
+        <TabelDashboard />
       </>
     </Mainlayout>
   );
