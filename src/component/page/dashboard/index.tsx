@@ -514,10 +514,10 @@ const DashboardPages: React.FC = () => {
           {/* Dashboard Header */}
           <div className="mb-4 md:mb-6">
             <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-1 md:mb-2">
-              Dashboard modernisasi sarpras pendidikan kp
+              Dashboard Modernisasi Sarpras Pendidikan Kp
             </h1>
             <p className="text-sm md:text-base text-gray-600">
-              Monitoring seluruh kegiatan Modernisasi sarpras pendidikan kp
+              Monitoring seluruh kegiatan Modernisasi Sarpras Pendidikan Kp
             </p>
 
             {/* Define userRole here, or retrieve from context/auth */}
