@@ -1,16 +1,27 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Eye, Info, Menu, X } from "lucide-react";
 import Mainlayout from "@/component/layout";
 import SelectSatdik from "@/component/dropdown/satdikDropdown";
+import { getCookie } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 
 interface Activity {
   ruangLingkup: string;
   pic: string;
   namaKontraktor: string;
+}
+
+interface DecodedToken {
+  exp: number;
+  id_admin: string;
+  id_unit_kerja: string;
+  name: string;
+  role: string;
+  type: string;
 }
 
 interface ProjectData {
@@ -25,6 +36,33 @@ const DashboardPages: React.FC = () => {
     [key: string]: boolean;
   }>({});
 
+  const [userName, setUserName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
+  const [selectIdSatdik, setIdSatidk] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      // Get token from cookie
+      const token = getCookie("XSX01");
+
+      if (typeof token === "string" && token) {
+        // Decode token
+        const decoded = jwtDecode<DecodedToken>(token);
+
+        // Set user data
+        setUserName(decoded.name);
+        setUserRole(decoded.type);
+
+        console.log("Decoded token:", decoded);
+      } else {
+        console.log("No token found or token is not a string");
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      setUserName("Guest");
+      setUserRole("");
+    }
+  }, []);
   const formatRupiah = (amount: number): string => {
     return amount.toLocaleString("id-ID");
   };
@@ -484,15 +522,15 @@ const DashboardPages: React.FC = () => {
 
             {/* Define userRole here, or retrieve from context/auth */}
             {(() => {
-              const userRole = "Admin Pusat"; // Replace with actual logic to get user role
               return userRole === "Admin Pusat" ? (
                 <div className="max-w-full">
                   <SelectSatdik
                     selectTedOption={(option: any) => {
-                      // handle selected option here
-                      // e.g., console.log(option);
+                      setIdSatidk(option.id); // simpan ID
                     }}
-                    setNameSatdik={() => {}}
+                    setNameSatdik={(nama: string) => {
+                      console.log("Nama satdik terpilih:", nama);
+                    }}
                   />
                 </div>
               ) : null;

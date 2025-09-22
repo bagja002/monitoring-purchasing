@@ -92,7 +92,7 @@ export default function KegiatanPengadaanPage() {
   );
 
   const fetchAllData = useCallback(async () => {
-    if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
+   // if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
 
     try {
       setLoading(true);
@@ -151,7 +151,9 @@ return (
         </div>
 
         {/* Button tambah */}
-        <div className="flex justify-start mb-4">
+
+        {userRole ==="Operator"&&(
+          <div className="flex justify-start mb-4">
           <button
             type="button"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -160,6 +162,9 @@ return (
             Tambahkan Kegiatan Pengadaan
           </button>
         </div>
+
+        )}
+        
 
         {/* Loading & Error state */}
         {loading && <p className="text-gray-500">Loading data...</p>}

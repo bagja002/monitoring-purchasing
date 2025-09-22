@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import axios from 'axios';
 import { setCookie } from "cookies-next";
 
-const AdminLoginForm: React.FC = () => {
+const   AdminLoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -111,7 +111,7 @@ const AdminLoginForm: React.FC = () => {
             Login EProc
           </CardTitle>
           <CardDescription className="text-lg font-semibold text-gray-700 mt-1">
-            Operator Satdik Login
+            Admin Pusat Login
           </CardDescription>
           <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto mt-2">
             Sistem Monitoring Pengadaan Moderenisasi Sapras Pendidikan

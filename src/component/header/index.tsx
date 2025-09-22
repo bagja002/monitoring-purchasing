@@ -20,8 +20,8 @@ const Header = (props: {
   Foto?: string;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
-  const [userName, setUserName] = useState<string>("");
-  const [userRole, setUserRole] = useState<string>("");
+    const [userName, setUserName] = useState<string>("");
+    const [userRole, setUserRole] = useState<string>("");
 
   useEffect(() => {
     try {
