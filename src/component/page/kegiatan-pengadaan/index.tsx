@@ -62,15 +62,13 @@ export default function KegiatanPengadaanPage() {
     pembangunan: [],
   });
 
-  // Decode token sekali di awal
+  // ✅ Decode token sekali di awal
   useEffect(() => {
     try {
       const token = getCookie("XSX01");
       if (typeof token === "string" && token) {
         const decoded = jwtDecode<DecodedToken>(token);
         setUserRole(decoded.type);
-         console.log("ID Satdik Operator:", decoded.type);
-        
 
         if (decoded.type === "Operator Satdik") {
           // 🚀 Operator langsung pakai id_unit_kerja
@@ -79,6 +77,9 @@ export default function KegiatanPengadaanPage() {
         } else if (decoded.type === "Admin Pusat") {
           // 🚀 Admin Pusat default 0 → user pilih dropdown
           setSelectedSatdikId(0);
+        } else if (decoded.type === "Admin Satdik") {
+          // 🚀 Admin Satdik default 0 → langsung render dengan id_satdik = 0
+          setSelectedSatdikId(0);
         }
       }
     } catch (err) {
@@ -86,8 +87,9 @@ export default function KegiatanPengadaanPage() {
       setUserRole("");
       setSelectedSatdikId(0);
     }
-  }, [IdSatdik]);
+  }, []); // ✅ Dependency array kosong - hanya jalan sekali
 
+  // ✅ fetch data by kategori
   const fetchDataByKategori = useCallback(
     async (kategori: string, selectedSatdikId: number) => {
       const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
@@ -98,15 +100,16 @@ export default function KegiatanPengadaanPage() {
       }
 
       const finalUrl = `${baseUrl}?${queryParams}`;
+
+      console.log(finalUrl);
       const response = await axios.get<PerencanaanKegiatanReal[]>(finalUrl);
       return response.data;
     },
     [BASE_URL]
   );
 
+  // ✅ fetch semua kategori
   const fetchAllData = useCallback(async () => {
-    // if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
-
     try {
       setLoading(true);
       setError(null);
@@ -130,15 +133,21 @@ export default function KegiatanPengadaanPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchDataByKategori, IdSatdik]);
+  }, [fetchDataByKategori, IdSatdik, userRole]);
 
+  // ✅ Jalan setiap IdSatdik atau userRole berubah
   useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+    if (userRole) {
+      fetchAllData();
+    }
+  }, [fetchAllData, userRole]);
+
+  // ✅ handler pilih satdik dari dropdown
   const handleSatdikSelect = (id: number) => {
     setSelectedSatdikId(id);
   };
 
+  // ✅ handler tombol tambah
   const handleClick = () => {
     router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
@@ -161,9 +170,8 @@ export default function KegiatanPengadaanPage() {
           <PaguAwal />
         </div>
 
-        {/* Button tambah */}
-
-        {userRole === "Operator" && (
+        {/* Button tambah - untuk Operator Satdik dan Admin Satdik */}
+        {(userRole === "Operator Satdik" || userRole === "Admin Satdik") && (
           <div className="flex justify-start mb-4">
             <button
               type="button"
@@ -179,7 +187,7 @@ export default function KegiatanPengadaanPage() {
         {loading && <p className="text-gray-500">Loading data...</p>}
         {error && <p className="text-red-600">{error}</p>}
 
-        {/* Data sections */}
+        {/* Data sections - tampil untuk semua role */}
         {!loading && !error && (
           <div className="space-y-8">
             {(
