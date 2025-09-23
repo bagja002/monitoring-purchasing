@@ -8,6 +8,8 @@ import Mainlayout from "@/component/layout";
 import SelectSatdik from "@/component/dropdown/satdikDropdown";
 import { getCookie } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
+import { Dashboard1 } from "@/component/interface/dataDashboard";
+import axios from "axios";
 
 interface Activity {
   ruangLingkup: string;
@@ -31,7 +33,7 @@ interface ProjectData {
   activities: Activity[];
 }
 
-const DashboardPages: React.FC = () => {
+const   DashboardPages: React.FC = () => {
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
@@ -39,6 +41,37 @@ const DashboardPages: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [userRole, setUserRole] = useState<string>("");
   const [selectIdSatdik, setIdSatidk] = useState<number>(0);
+  const baseUrl = "http://103.177.176.202:6402";
+  const [dataDashboard1, setDataDashboard1] = useState<Dashboard1>();
+
+  //Pengadaan Barang
+  //Perbaikan Gedung dan Bangunan
+  //Pembangunan Gedung Baru
+
+  // Fungsi untuk mengambil data dashboard dengan axios
+  const fetchDashboardData = async (id_satdik: number) => {
+    try {
+      const token = getCookie("XSX01");
+      const headers: Record<string, string> = {};
+
+      if (typeof token === "string" && token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      let url = `${baseUrl}/dashboard`;
+      if (id_satdik !== 0) {
+        url = `${baseUrl}/dashboard/?id_satdik=${id_satdik}`;
+        // atau `${baseUrl}/dashboard?id_satdik=${id_satdik}`
+        // tergantung backend kamu
+      }
+
+      const response = await axios.get(url, { headers });
+
+      setDataDashboard1(response.data.data);
+    } catch (error) {
+      console.error("Gagal mengambil data dashboard:", error);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -52,6 +85,7 @@ const DashboardPages: React.FC = () => {
         // Set user data
         setUserName(decoded.name);
         setUserRole(decoded.type);
+        setIdSatidk(Number(decoded.id_unit_kerja));
 
         console.log("Decoded token:", decoded);
       } else {
@@ -62,7 +96,13 @@ const DashboardPages: React.FC = () => {
       setUserName("Guest");
       setUserRole("");
     }
-  }, []);
+  }, [selectIdSatdik]);
+
+  useEffect(() => {
+    fetchDashboardData(selectIdSatdik);
+  }, [selectIdSatdik]);
+
+
   const formatRupiah = (amount: number): string => {
     return amount.toLocaleString("id-ID");
   };
@@ -83,7 +123,7 @@ const DashboardPages: React.FC = () => {
         {
           ruangLingkup: "Pembangunan Lapangan Basket",
           pic: "Prep Anggaran",
-          namaKontraktor: "-",
+          namaKontraktor: "",
         },
         {
           ruangLingkup: "Renovasi Gedung Utama",
@@ -175,27 +215,31 @@ const DashboardPages: React.FC = () => {
                 <div className="text-xs md:text-sm text-gray-600 mb-1">
                   Anggaran
                 </div>
-                <div className="font-semibold text-sm md:text-base">0</div>
+                <div className="font-semibold text-sm md:text-base">
+                  Rp 6000000
+                </div>
               </div>
               <div>
                 <div className="text-xs md:text-sm text-gray-600 mb-1">
                   Realisasi
                 </div>
-                <div className="font-semibold text-sm md:text-base">0</div>
+                <div className="font-semibold text-sm md:text-base">
+                  555555555
+                </div>
               </div>
               <div>
                 <div className="text-xs md:text-sm text-gray-600 mb-1">
                   Deviasi
                 </div>
                 <div className="font-semibold text-red-600 text-sm md:text-base">
-                  0
+                  50000
                 </div>
               </div>
               <div className="md:block">
                 <div className="text-xs md:text-sm text-gray-600 mb-1">
                   Target
                 </div>
-                <div className="font-semibold text-sm md:text-base">0</div>
+                <div className="font-semibold text-sm md:text-base"></div>
               </div>
               <div className="md:block">
                 <div className="text-xs md:text-sm text-gray-600 mb-1">
@@ -241,7 +285,7 @@ const DashboardPages: React.FC = () => {
               </Button>
               <div className="sm:ml-4">
                 <span className="text-xs md:text-sm text-gray-600">
-                  Nilai Total Proyek
+                  Nilai Total Proyek Testing
                 </span>
                 <div className="text-lg md:text-xl font-bold">
                   {project.totalValue}
@@ -277,7 +321,7 @@ const DashboardPages: React.FC = () => {
             {/* Table Header */}
             <div className="bg-gray-50 border-b">
               <div className="grid grid-cols-5 gap-1 p-3 text-xs font-semibold text-gray-700">
-                <div>Ruang Lingkup Pekerjaan</div>
+                <div>Ruang Lingkup Pekerjaan Testing</div>
                 <div>PIC</div>
                 <div>Nama Kontraktor</div>
                 <div>Progress Keuangan</div>
@@ -524,53 +568,81 @@ const DashboardPages: React.FC = () => {
             {(() => {
               return userRole === "Admin Pusat" ? (
                 <div className="max-w-full">
-                  <SelectSatdik
-                    selectTedOption={(option: any) => {
-                      setIdSatidk(option.id); // simpan ID
-                    }}
-                    setNameSatdik={(nama: string) => {
-                      console.log("Nama satdik terpilih:", nama);
-                    }}
-                  />
+                  <SelectSatdik selectTedOption={setIdSatidk} />
                 </div>
               ) : null;
             })()}
             {/* Summary Stats */}
             <div className="mt-3 md:mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-              <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+              <Card className="bg-gradient-to-r from-sky-500 to-sky-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">Pagu Awal</div>
+                  <div className="text-sm md:text-xl font-bold">Rp {}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Total Semua Proyek
+                    Pagu Definitif
                   </div>
                   <div className="text-sm md:text-xl font-bold">
-                    Rp {totalAllProjects.toLocaleString("id-ID")}
+                    Rp {dataDashboard1?.total_anggaran.toLocaleString()}
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+
+              <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Jumlah Proyek
+                    Realisasi Fisik
                   </div>
-                  <div className="text-lg md:text-2xl font-bold">
-                    {projects.length}
+                  <div className="text-sm md:text-xl font-bold">{0}%</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Anggaran
+                  </div>
+                  <div className="text-sm md:text-xl font-bold">Rp. {0}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">Deviasi</div>
+                  <div className="text-sm md:text-xl font-bold">
+                    Rp.{" "}
+                    {typeof dataDashboard1?.total_anggaran === "number"
+                      ? (
+                          dataDashboard1.total_anggaran - 300000000000
+                        ).toLocaleString()
+                      : ""}
                   </div>
                 </CardContent>
               </Card>
+
+              <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
+                    Jumlah Kegiatan
+                  </div>
+                  <div className="text-lg md:text-2xl font-bold">
+                    {dataDashboard1?.total_kegiatan}
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Total Aktivitas
+                    Kegiatan Selesai
                   </div>
                   <div className="text-lg md:text-2xl font-bold">
                     {totalActivities}
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Status</div>
-                  <div className="text-lg md:text-2xl font-bold">Aktif</div>
                 </CardContent>
               </Card>
             </div>

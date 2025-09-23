@@ -12,7 +12,9 @@ import DataTable from "@/component/tabel/dataTable";
 import DataTablePembangunanRenovasi from "@/component/tabel/dataTableRenovAndBangun";
 import PaguAwal from "@/component/tabel/tableDataIdentifikasiPagu";
 import { PerencanaanKegiatanReal } from "@/component/interface/dataReal";
-import DataTablePelaksaan, { PengawasanKegiatan } from "@/component/tabel/dataTablePelaksaan";
+import DataTablePelaksaan, {
+  PengawasanKegiatan,
+} from "@/component/tabel/dataTablePelaksaan";
 
 interface DecodedToken {
   exp: number;
@@ -139,7 +141,9 @@ export default function KegiatanPelaksananPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [data, setData] = useState<Record<KategoriKey, PerencanaanKegiatanReal[]>>({
+  const [data, setData] = useState<
+    Record<KategoriKey, PerencanaanKegiatanReal[]>
+  >({
     pengadaan: [],
     revitalisasi: [],
     pembangunan: [],
@@ -184,12 +188,15 @@ export default function KegiatanPelaksananPage() {
       setError(null);
 
       const results = await Promise.all(
-        (Object.entries(kategoriConfig) as [KategoriKey, typeof kategoriConfig[KategoriKey]][]).map(
-          async ([key, cfg]) => {
-            const res = await fetchDataByKategori(cfg.query, IdSatdik);
-            return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
-          }
-        )
+        (
+          Object.entries(kategoriConfig) as [
+            KategoriKey,
+            (typeof kategoriConfig)[KategoriKey]
+          ][]
+        ).map(async ([key, cfg]) => {
+          const res = await fetchDataByKategori(cfg.query, IdSatdik);
+          return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
+        })
       );
 
       setData(Object.fromEntries(results) as typeof data);
@@ -213,17 +220,14 @@ export default function KegiatanPelaksananPage() {
     router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
 
-
-return (
+  return (
     <Mainlayout>
       <div className="space-y-6 p-4 text-black">
         {/* Dropdown Satdik */}
         {userRole === "Admin Pusat" && (
           <div className="max-w-xs">
-            <SelectSatdik
-              selectTedOption={handleSatdikSelect}
-              setNameSatdik={() => {}}
-            />
+            {" "}
+            <SelectSatdik selectTedOption={handleSatdikSelect} />{" "}
           </div>
         )}
 
@@ -249,5 +253,4 @@ return (
       </div>
     </Mainlayout>
   );
-
 }

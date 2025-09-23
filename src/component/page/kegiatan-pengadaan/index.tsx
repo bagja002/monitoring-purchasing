@@ -54,7 +54,9 @@ export default function KegiatanPengadaanPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [data, setData] = useState<Record<KategoriKey, PerencanaanKegiatanReal[]>>({
+  const [data, setData] = useState<
+    Record<KategoriKey, PerencanaanKegiatanReal[]>
+  >({
     pengadaan: [],
     revitalisasi: [],
     pembangunan: [],
@@ -67,13 +69,24 @@ export default function KegiatanPengadaanPage() {
       if (typeof token === "string" && token) {
         const decoded = jwtDecode<DecodedToken>(token);
         setUserRole(decoded.type);
-        setSelectedSatdikId(Number(decoded.id_unit_kerja));
+         console.log("ID Satdik Operator:", decoded.type);
+        
+
+        if (decoded.type === "Operator Satdik") {
+          // 🚀 Operator langsung pakai id_unit_kerja
+          setSelectedSatdikId(Number(decoded.id_unit_kerja));
+          console.log("ID Satdik Operator:", decoded.id_unit_kerja);
+        } else if (decoded.type === "Admin Pusat") {
+          // 🚀 Admin Pusat default 0 → user pilih dropdown
+          setSelectedSatdikId(0);
+        }
       }
     } catch (err) {
       console.error("Error decoding token:", err);
       setUserRole("");
+      setSelectedSatdikId(0);
     }
-  }, []);
+  }, [IdSatdik]);
 
   const fetchDataByKategori = useCallback(
     async (kategori: string, selectedSatdikId: number) => {
@@ -92,19 +105,22 @@ export default function KegiatanPengadaanPage() {
   );
 
   const fetchAllData = useCallback(async () => {
-   // if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
+    // if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
 
     try {
       setLoading(true);
       setError(null);
 
       const results = await Promise.all(
-        (Object.entries(kategoriConfig) as [KategoriKey, typeof kategoriConfig[KategoriKey]][]).map(
-          async ([key, cfg]) => {
-            const res = await fetchDataByKategori(cfg.query, IdSatdik);
-            return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
-          }
-        )
+        (
+          Object.entries(kategoriConfig) as [
+            KategoriKey,
+            (typeof kategoriConfig)[KategoriKey]
+          ][]
+        ).map(async ([key, cfg]) => {
+          const res = await fetchDataByKategori(cfg.query, IdSatdik);
+          return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
+        })
       );
 
       setData(Object.fromEntries(results) as typeof data);
@@ -119,7 +135,6 @@ export default function KegiatanPengadaanPage() {
   useEffect(() => {
     fetchAllData();
   }, [fetchAllData]);
-
   const handleSatdikSelect = (id: number) => {
     setSelectedSatdikId(id);
   };
@@ -128,17 +143,13 @@ export default function KegiatanPengadaanPage() {
     router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
 
-
-return (
+  return (
     <Mainlayout>
       <div className="space-y-6 p-4 text-black">
         {/* Dropdown Satdik */}
         {userRole === "Admin Pusat" && (
           <div className="max-w-xs">
-            <SelectSatdik
-              selectTedOption={handleSatdikSelect}
-              setNameSatdik={() => {}}
-            />
+            <SelectSatdik selectTedOption={handleSatdikSelect} />
           </div>
         )}
 
@@ -152,19 +163,17 @@ return (
 
         {/* Button tambah */}
 
-        {userRole ==="Operator"&&(
+        {userRole === "Operator" && (
           <div className="flex justify-start mb-4">
-          <button
-            type="button"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            onClick={handleClick}
-          >
-            Tambahkan Kegiatan Pengadaan
-          </button>
-        </div>
-
+            <button
+              type="button"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onClick={handleClick}
+            >
+              Tambahkan Kegiatan Pengadaan
+            </button>
+          </div>
         )}
-        
 
         {/* Loading & Error state */}
         {loading && <p className="text-gray-500">Loading data...</p>}
@@ -176,7 +185,7 @@ return (
             {(
               Object.entries(kategoriConfig) as [
                 KategoriKey,
-                typeof kategoriConfig[KategoriKey]
+                (typeof kategoriConfig)[KategoriKey]
               ][]
             ).map(([key, cfg]) => (
               <section key={key}>
@@ -193,5 +202,4 @@ return (
       </div>
     </Mainlayout>
   );
-
 }
