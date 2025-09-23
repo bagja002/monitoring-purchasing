@@ -44,6 +44,8 @@ const   DashboardPages: React.FC = () => {
   const baseUrl = "http://103.177.176.202:6402";
   const [dataDashboard1, setDataDashboard1] = useState<Dashboard1>();
 
+  //Oke 
+
   //Pengadaan Barang
   //Perbaikan Gedung dan Bangunan
   //Pembangunan Gedung Baru
