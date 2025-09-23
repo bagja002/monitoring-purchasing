@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,13 @@ interface DecodedToken {
   role: string;
   type: string;
 }
-
+interface DashboardResponse {
+  total_kegiatan: number;
+  total_anggaran: number;
+  total_perbaikan: number;
+  total_pengadaan_barang: number;
+  total_pembangunan_baru: number;
+}
 interface ProjectData {
   id: string;
   title: string;
@@ -33,77 +39,143 @@ interface ProjectData {
   activities: Activity[];
 }
 
-const   DashboardPages: React.FC = () => {
+const DashboardPages: React.FC = () => {
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
 
   const [userName, setUserName] = useState<string>("");
+  const [IdSatdik, setSelectedSatdikId] = useState<number>(0);
   const [userRole, setUserRole] = useState<string>("");
-  const [selectIdSatdik, setIdSatidk] = useState<number>(0);
-  const baseUrl = "http://103.177.176.202:6402";
+  const [loading, setLoading] = useState<boolean>(true);
   const [dataDashboard1, setDataDashboard1] = useState<Dashboard1>();
 
-  //Oke 
+  const baseUrl = "http://103.177.176.202:6402";
 
-  //Pengadaan Barang
-  //Perbaikan Gedung dan Bangunan
-  //Pembangunan Gedung Baru
+  // Function untuk get cookie
+  const getCookie = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+    return null;
+  };
 
-  // Fungsi untuk mengambil data dashboard dengan axios
-  const fetchDashboardData = async (id_satdik: number) => {
-    try {
+  const fetchDashboardData = useCallback(
+    async (id_satdik: number): Promise<DashboardResponse> => {
       const token = getCookie("XSX01");
-      const headers: Record<string, string> = {};
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
 
       if (typeof token === "string" && token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      let url = `${baseUrl}/dashboard`;
+      const url = new URL(`${baseUrl}/dashboard`);
+
+      // Hanya tambahkan id_satdik jika bukan 0 (untuk Admin Pusat bisa pilih semua)
       if (id_satdik !== 0) {
-        url = `${baseUrl}/dashboard/?id_satdik=${id_satdik}`;
-        // atau `${baseUrl}/dashboard?id_satdik=${id_satdik}`
-        // tergantung backend kamu
+        url.searchParams.set("id_satdik", id_satdik.toString());
       }
 
-      const response = await axios.get(url, { headers });
+      try {
+        const response = await axios.get<{ data: DashboardResponse }>(
+          url.toString(),
+          { headers }
+        );
 
-      setDataDashboard1(response.data.data);
-    } catch (error) {
-      console.error("Gagal mengambil data dashboard:", error);
-    }
-  };
-
-  useEffect(() => {
-    try {
-      // Get token from cookie
-      const token = getCookie("XSX01");
-
-      if (typeof token === "string" && token) {
-        // Decode token
-        const decoded = jwtDecode<DecodedToken>(token);
-
-        // Set user data
-        setUserName(decoded.name);
-        setUserRole(decoded.type);
-        setIdSatidk(Number(decoded.id_unit_kerja));
-
-        console.log("Decoded token:", decoded);
-      } else {
-        console.log("No token found or token is not a string");
+        return response.data.data;
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        throw error;
       }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      setUserName("Guest");
-      setUserRole("");
-    }
-  }, [selectIdSatdik]);
+    },
+    [baseUrl]
+  );
 
+  // Effect untuk decode token dan set initial values
   useEffect(() => {
-    fetchDashboardData(selectIdSatdik);
-  }, [selectIdSatdik]);
+    const initializeUser = () => {
+      try {
+        const token = getCookie("XSX01");
 
+        if (typeof token === "string" && token) {
+          const decoded = jwtDecode<DecodedToken>(token);
+
+          setUserRole(decoded.type);
+          console.log("User Role:", decoded.type);
+
+          switch (decoded.type) {
+            case "Operator Satdik":
+              // Operator langsung pakai id_unit_kerja
+              const operatorSatdikId = Number(decoded.id_unit_kerja);
+              setSelectedSatdikId(operatorSatdikId);
+              console.log("ID Satdik Operator:", operatorSatdikId);
+              break;
+
+            case "Admin Pusat":
+              // Admin Pusat default 0 (bisa pilih semua atau via dropdown)
+              setSelectedSatdikId(0);
+              console.log("Admin Pusat - Default ID: 0");
+              break;
+
+            case "Admin Satdik":
+              // Admin Satdik bisa pilih atau default 0
+              setSelectedSatdikId(0);
+              console.log("Admin Satdik - Default ID: 0");
+              break;
+
+            default:
+              console.warn("Unknown user role:", decoded.type);
+              setSelectedSatdikId(0);
+          }
+        } else {
+          console.error("No valid token found");
+          setUserRole("");
+          setSelectedSatdikId(0);
+        }
+      } catch (err) {
+        console.error("Error decoding token:", err);
+        setUserRole("");
+        setSelectedSatdikId(0);
+      }
+    };
+
+    initializeUser();
+  }, []);
+
+  // Effect untuk fetch data ketika IdSatdik atau userRole berubah
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      // Hanya fetch jika user role sudah ada
+      if (!userRole) return;
+
+      setLoading(true);
+
+      try {
+        console.log("Fetching dashboard data for ID Satdik:", IdSatdik);
+        const dashboardData = await fetchDashboardData(IdSatdik);
+
+        setDataDashboard1({
+          ...dashboardData,
+          total_anggaran: dashboardData.total_anggaran,
+          total_kegiatan: dashboardData.total_kegiatan,
+          total_perbaikan: dashboardData.total_perbaikan,
+          total_pengadaan_barang: dashboardData.total_pengadaan_barang,
+          total_pembangunan_baru: dashboardData.total_pembangunan_baru,
+          
+        });
+        console.log("Dashboard data loaded successfully:", dashboardData);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+        // Handle error (show toast, set error state, etc.)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [IdSatdik, userRole, fetchDashboardData]);
 
   const formatRupiah = (amount: number): string => {
     return amount.toLocaleString("id-ID");
@@ -553,6 +625,49 @@ const   DashboardPages: React.FC = () => {
     return acc + project.activities.length;
   }, 0);
 
+  // Utility function untuk format currency Indonesia
+  const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return "Rp 0";
+
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Alternative format dengan custom function
+  const formatCurrencyCustom = (amount) => {
+    if (!amount && amount !== 0) return "Rp 0";
+
+    // Convert to string and add thousand separators
+    const formatted = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `Rp ${formatted}`;
+  };
+
+  // Alternative format dengan abbreviation untuk angka besar
+  const formatCurrencyWithAbbr = (amount) => {
+    if (!amount && amount !== 0) return "Rp 0";
+
+    const trillion = 1000000000000;
+    const billion = 1000000000;
+    const million = 1000000;
+    const thousand = 1000;
+
+    if (amount >= trillion) {
+      return `Rp ${(amount / trillion).toFixed(1)} T`;
+    } else if (amount >= billion) {
+      return `Rp ${(amount / billion).toFixed(1)} M`;
+    } else if (amount >= million) {
+      return `Rp ${(amount / million).toFixed(1)} Jt`;
+    } else if (amount >= thousand) {
+      return `Rp ${(amount / thousand).toFixed(0)} Rb`;
+    } else {
+      return `Rp ${amount.toLocaleString("id-ID")}`;
+    }
+  };
+
   return (
     <Mainlayout>
       <div className="min-h-screen bg-gray-50 p-2 md:p-4">
@@ -563,65 +678,63 @@ const   DashboardPages: React.FC = () => {
               Dashboard Modernisasi Sarpras Pendidikan Kp
             </h1>
             <p className="text-sm md:text-base text-gray-600">
-              Monitoring seluruh kegiatan Modernisasi Sarpras Pendidikan Kp
+              Monitoring kegiatan Modernisasi Sarpras Pendidikan Kp
             </p>
 
             {/* Define userRole here, or retrieve from context/auth */}
             {(() => {
               return userRole === "Admin Pusat" ? (
                 <div className="max-w-full">
-                  <SelectSatdik selectTedOption={setIdSatidk} />
+                  <SelectSatdik selectTedOption={setSelectedSatdikId} />
                 </div>
               ) : null;
             })()}
             {/* Summary Stats */}
-            <div className="mt-3 md:mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-              <Card className="bg-gradient-to-r from-sky-500 to-sky-600 text-white">
-                <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Pagu Awal</div>
-                  <div className="text-sm md:text-xl font-bold">Rp {}</div>
-                </CardContent>
-              </Card>
+            <div className="mt-3 md:mt-4 grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4">
+              {/* Budget Information - Blue Tones */}
 
               <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Pagu Definitif
+                    Pagu Total
                   </div>
                   <div className="text-sm md:text-xl font-bold">
-                    Rp {dataDashboard1?.total_anggaran.toLocaleString()}
+                    {formatCurrency(dataDashboard1?.total_anggaran)}
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Planning Information - Green Tones */}
               <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Realisasi Fisik
+                    Total Paket
                   </div>
-                  <div className="text-sm md:text-xl font-bold">{0}%</div>
+                  <div className="text-sm md:text-xl font-bold">
+                    {dataDashboard1?.total_kegiatan}
+                  </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Realisasi Anggaran
+                    Pengadaan Barang
                   </div>
-                  <div className="text-sm md:text-xl font-bold">Rp. {0}</div>
+                  <div className="text-sm md:text-xl font-bold">
+                  {formatCurrency(dataDashboard1?.total_pengadaan_barang)}
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white">
+              {/* Activity Categories - Warm Tones */}
+              <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Deviasi</div>
-                  <div className="text-sm md:text-xl font-bold">
-                    Rp.{" "}
-                    {typeof dataDashboard1?.total_anggaran === "number"
-                      ? (
-                          dataDashboard1.total_anggaran - 300000000000
-                        ).toLocaleString()
-                      : ""}
+                  <div className="text-xs md:text-sm opacity-90">
+                    Renovasi Gedung dan Bangunan
+                  </div>
+                   <div className="text-sm md:text-xl font-bold">
+                   {formatCurrency(dataDashboard1?.total_perbaikan)}
                   </div>
                 </CardContent>
               </Card>
@@ -629,21 +742,68 @@ const   DashboardPages: React.FC = () => {
               <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
-                    Jumlah Kegiatan
+                    Pembangunan Gedung Baru
                   </div>
-                  <div className="text-lg md:text-2xl font-bold">
-                    {dataDashboard1?.total_kegiatan}
+                   <div className="text-sm md:text-xl font-bold"> 
+                    {formatCurrency(dataDashboard1?.total_pembangunan_baru)}
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Realization Information - Purple Tones */}
+              <Card className="bg-gradient-to-r from-violet-500 to-violet-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Keuangan
+                  </div>
+                  <div className="text-sm md:text-xl font-bold">Rp - </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
                 <CardContent className="p-3 md:p-4">
                   <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Pengadaan Barang
+                  </div>
+                   <div className="text-sm md:text-xl font-bold">Rp - </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Renovasi Gedung
+                  </div>
+                    <div className="text-sm md:text-xl font-bold">Rp - </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-pink-500 to-pink-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Pembangunan Baru
+                  </div>
+                   <div className="text-sm md:text-xl font-bold">Rp - </div>
+                </CardContent>
+              </Card>
+
+              {/* Status Information - Red & Success Tones */}
+              <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">Deviasi</div>
+                  <div className="text-sm md:text-xl font-bold">
+                  {formatCurrency(dataDashboard1?.total_anggaran - 0)}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                <CardContent className="p-3 md:p-4">
+                  <div className="text-xs md:text-sm opacity-90">
                     Kegiatan Selesai
                   </div>
                   <div className="text-lg md:text-2xl font-bold">
-                    {totalActivities}
+                    0
                   </div>
                 </CardContent>
               </Card>
