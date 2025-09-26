@@ -241,7 +241,7 @@ export default function RekapitulasiTable() {
           <li>RAA (ALSIN) = Rencana Anggaran dan Aktivitas untuk Alat dan Mesin</li>
           <li>RBI = Rencana Biaya Investasi untuk Gedung & Bangunan</li>
           <li>Angka dalam rupiah, persentase menunjukkan proporsi dari total jumlah</li>
-          <li>Tanda "-" menunjukkan tidak ada alokasi anggaran</li>
+          <li>Tanda - menunjukkan tidak ada alokasi anggaran</li>
         </ul>
       </div>
     </div>
