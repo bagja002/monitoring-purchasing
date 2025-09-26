@@ -144,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <span className="text-xl font-bold text-gray-800">Eproc</span>
+          <span className="text-xl font-bold text-gray-800">Proc750</span>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="lg:hidden p-2 rounded hover:bg-gray-100"

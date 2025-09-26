@@ -164,9 +164,7 @@ export default function KegiatanPengadaanPage() {
 
         {/* Pagu Awal */}
         <div>
-          <div className="flex justify-center items-center w-full py-6">
-            <h2 className="text-xl font-semibold mb-4">Pagu Awal</h2>
-          </div>
+         
           <PaguAwal />
         </div>
 
