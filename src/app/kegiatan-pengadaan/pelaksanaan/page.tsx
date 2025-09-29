@@ -1,3 +1,4 @@
+import Mainlayout from "@/component/layout";
 import LoginForm from "@/component/page/auth/operator/login";
 import DashboardPages from "@/component/page/dashboard";
 import KegiatanPengadaanPage from "@/component/page/kegiatan-pengadaan";
@@ -13,6 +14,11 @@ export const metadata: Metadata = {
 
 export default function Pelaksaan(){
     return (
-        <KegiatanPelaksananPage />
+        // <KegiatanPelaksananPage />
+        <>
+            <Mainlayout>
+               Halaman Dalam Tahap Pengembangan
+            </Mainlayout>
+        </>
     )
 }

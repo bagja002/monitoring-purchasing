@@ -39,10 +39,14 @@ type RealisasiKeuanganFormData = {
   link_dokumen_keuangan: string;
 };
 
+
+
+	
+
 // Type untuk form laporan mingguan
 type LaporanMingguanFormData = {
   id_pelaksanaan_pengadaan: number;
-  minggu_ke: number;
+  minggu_ke: string;
   target_fisik: number;
   realisasi_fisik: number;
   deviasi_fisik: number;
@@ -50,6 +54,7 @@ type LaporanMingguanFormData = {
   tindak_lanjut_rekomendasi_sebelumnya: string;
   permasalahan_yang_dihadapi: string;
   rekomendasi: string;
+  link_dokumen_laporan:string
 };
 
 const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
@@ -65,29 +70,25 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
         header: "Target Fisik",
         columns: [
           {
-            accessorKey: "minggu",
+            accessorKey: "minggu_ke",
             header: "Minggu",
           },
           {
             accessorKey: "target_fisik",
             header: "Target",
           },
-        
         ],
       },
       {
         id: "realisasi_fisik",
         header: "Realisasi Fisik",
         columns: [
-          {
-            accessorKey: "minggu_fisik",
-            header: "Minggu",
-          },
+         
           {
             accessorKey: "realisasi_fisik",
             header: "Realisasi",
           },
-            {
+          {
             accessorKey: "deviasi",
             header: "Deviasi",
           },
@@ -177,7 +178,7 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
   } = useForm<LaporanMingguanFormData>({
     defaultValues: {
       id_pelaksanaan_pengadaan: parseInt(idPelaksaan),
-      minggu_ke: 1,
+      minggu_ke: "1",
       target_fisik: 0,
       realisasi_fisik: 0,
       deviasi_fisik: 0,
@@ -268,14 +269,8 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
 
     setValueLaporan("id_pelaksanaan_pengadaan", parseInt(idPelaksaan));
     setValueLaporan("minggu_ke", itemToEdit.minggu_ke);
-    setValueLaporan(
-      "target_fisik",
-      itemToEdit.target_fisik
-    );
-    setValueLaporan(
-      "realisasi_fisik",
-      itemToEdit.realisasi_fisik
-    );
+    setValueLaporan("target_fisik", Number(itemToEdit.target_fisik));
+    setValueLaporan("realisasi_fisik", Number(itemToEdit.realisasi_fisik));
     setValueLaporan(
       "tingkat_capaian_keberhasilan",
       itemToEdit.tingkat_capaian_keberhasilan || ""
@@ -284,7 +279,10 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
       "tindak_lanjut_rekomendasi_sebelumnya",
       itemToEdit.tindak_lanjut_rekomendasi_sebelumnya || ""
     );
-    setValueLaporan("permasalahan_yang_dihadapi", itemToEdit.permasalahan_yang_dihadapi || "");
+    setValueLaporan(
+      "permasalahan_yang_dihadapi",
+      itemToEdit.permasalahan_yang_dihadapi || ""
+    );
     setValueLaporan("rekomendasi", itemToEdit.rekomendasi || "");
 
     setOpenLaporan(true);
@@ -535,10 +533,7 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
     try {
       const payload = {
         ...data,
-        deviasi: calculateDeviasi(
-          data.target_fisik,
-          data.realisasi_fisik
-        ),
+        deviasi: calculateDeviasi(data.target_fisik, data.realisasi_fisik),
       };
 
       let response;
@@ -1029,7 +1024,7 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                         : "border-gray-300"
                     }`}
                     {...registerLaporan("minggu_ke", {
-                      required: "Minggu wajib diisi",
+                    
                       min: { value: 1, message: "Minggu minimal 1" },
                     })}
                   />
@@ -1044,13 +1039,14 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                 <div>
                   <label className="block mb-1 text-sm font-medium">
                     Target Fisik Per Minggu (%){" "}
-                    <span className="text-red-500">*</span>
+
                   </label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     step="0.01"
+                    
                     placeholder="0.00"
                     className={`border rounded w-full px-3 py-2 ${
                       errorsLaporan.target_fisik
@@ -1058,7 +1054,8 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                         : "border-gray-300"
                     }`}
                     {...registerLaporan("target_fisik", {
-                      required: "Target fisik wajib diisi",
+                       valueAsNumber: true, // ✅ Ini penting!
+                     
                       min: {
                         value: 0,
                         message: "Target fisik tidak boleh negatif",
@@ -1080,7 +1077,7 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                 <div>
                   <label className="block mb-1 text-sm font-medium">
                     Realisasi Fisik Per Minggu (%){" "}
-                    <span className="text-red-500">*</span>
+                   
                   </label>
                   <input
                     type="number"
@@ -1094,7 +1091,7 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                         : "border-gray-300"
                     }`}
                     {...registerLaporan("realisasi_fisik", {
-                      required: "Realisasi fisik wajib diisi",
+                      valueAsNumber: true, // ✅ Ini penting!
                       min: {
                         value: 0,
                         message: "Realisasi fisik tidak boleh negatif",
@@ -1113,84 +1110,83 @@ export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
                 </div>
               </div>
               {/* Tingkat Capaian Keberhasilan */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Tingkat Capaian Keberhasilan{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Masukkan tingkat capaian keberhasilan..."
-                  className={`border rounded w-full px-3 py-2 resize-vertical ${
-                    errorsLaporan.tingkat_capaian_keberhasilan
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                  {...registerLaporan("tingkat_capaian_keberhasilan", {
-                    required: "Tingkat capaian keberhasilan wajib diisi",
-                  })}
-                />
-                {errorsLaporan.tingkat_capaian_keberhasilan && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errorsLaporan.tingkat_capaian_keberhasilan.message}
-                  </p>
-                )}
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Tingkat Capaian Keberhasilan{" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Masukkan tingkat capaian keberhasilan..."
+                    className={`border rounded w-full px-3 py-2 resize-vertical ${
+                      errorsLaporan.tingkat_capaian_keberhasilan
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerLaporan("tingkat_capaian_keberhasilan", {
+                     
+                    })}
+                  />
+                  {errorsLaporan.tingkat_capaian_keberhasilan && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errorsLaporan.tingkat_capaian_keberhasilan.message}
+                    </p>
+                  )}
+                </div>
 
-              {/* Tindak Lanjut Rekomendasi Sebelumnya */}
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Tindak Lanjut Rekomendasi Sebelumnya
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Masukkan tindak lanjut rekomendasi sebelumnya..."
-                  className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
-                  {...registerLaporan("tindak_lanjut_rekomendasi_sebelumnya")}
-                />
+                {/* Tindak Lanjut Rekomendasi Sebelumnya */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Tindak Lanjut Rekomendasi Sebelumnya
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Masukkan tindak lanjut rekomendasi sebelumnya..."
+                    className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
+                    {...registerLaporan("tindak_lanjut_rekomendasi_sebelumnya")}
+                  />
+                </div>
               </div>
-           </div>
 
               {/* Permasalahan */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Permasalahan
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Masukkan permasalahan yang dihadapi..."
-                  className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
-                  {...registerLaporan("permasalahan_yang_dihadapi")}
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Permasalahan
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Masukkan permasalahan yang dihadapi..."
+                    className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
+                    {...registerLaporan("permasalahan_yang_dihadapi")}
+                  />
+                </div>
 
-              {/* Rekomendasi */}
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Rekomendasi <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Masukkan rekomendasi..."
-                  className={`border rounded w-full px-3 py-2 resize-vertical ${
-                    errorsLaporan.rekomendasi
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                  {...registerLaporan("rekomendasi", {
-                    required: "Rekomendasi wajib diisi",
-                  })}
-                />
-                {errorsLaporan.rekomendasi && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errorsLaporan.rekomendasi.message}
-                  </p>
-                )}
+                {/* Rekomendasi */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Rekomendasi <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Masukkan rekomendasi..."
+                    className={`border rounded w-full px-3 py-2 resize-vertical ${
+                      errorsLaporan.rekomendasi
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerLaporan("rekomendasi", {
+                    
+                    })}
+                  />
+                  {errorsLaporan.rekomendasi && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errorsLaporan.rekomendasi.message}
+                    </p>
+                  )}
+                </div>
               </div>
-
-            </div>
               {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting

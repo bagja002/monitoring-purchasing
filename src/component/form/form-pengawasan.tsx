@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
+import { Textarea } from "@/components/ui/textarea";
 
 
 export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
@@ -49,6 +50,16 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">Kategori Pengadaan</Label>
           <Input readOnly {...register("kategori_pengadaan")} />
         </div>
+             <div>
+          <Label className="mb-2">Metode Pemilihan</Label>
+             <Input
+            readOnly={!isEdit}
+            {...register("metode_pemilihan")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+        
+        
 
         <div>
           <Label className="mb-2">Lokasi Kerja</Label>
@@ -64,6 +75,50 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Input
             readOnly={!isEdit}
             {...register("link_cctv")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 space-x-5">
+        <div>
+          <Label className="mb-2">Nama Penyedia</Label>
+          <Input
+            readOnly={!isEdit}
+            {...register("nama_penyedia")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+        <div>
+          <Label className="mb-2">Npwp Penyedia</Label>
+          <Input
+            readOnly={!isEdit}
+            {...register("npwp")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+        <div>
+          <Label className="mb-2">Alamat Penyeedia</Label>
+          <Textarea
+            readOnly={!isEdit}
+            {...register("alamat_penyedia")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 space-x-5">
+         <div>
+          <Label className="mb-2">No Tanggal Kontrak SPK</Label>
+          <Input
+            readOnly={!isEdit}
+            {...register("no_tanggal_kontrak_spk")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+         <div>
+          <Label className="mb-2">Tanggal Kontrak Berakhir</Label>
+          <Input
+            readOnly={!isEdit}
+            {...register("tanggal_kontrak_berakhir")}
             className={!isEdit ? "bg-gray-50" : ""}
           />
         </div>

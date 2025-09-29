@@ -28,7 +28,7 @@ export interface PerencanaanKegiatanReal {
   hps_nilai_p_konsultan_perencanaan: string;
   rancangan_kontrak_p_konsultan_perencanaan: string;
   hasil_pendampingan_p_konsultan_perencanaan: string;
-  
+
   sirup_p_kontruksi: string;
   metode_pemilihan_p_kontruksi: string;
   justifikasi_pemilihan_p_kontruksi: string;
@@ -44,7 +44,7 @@ export interface PerencanaanKegiatanReal {
   sirup_p_konsultan_pengawas: string;
   metode_pemilihan_p_konsultan_pengawas: string;
   justifikasi_pemilihan_p_konsultan_pengawas: string;
-  kak_p_konsultan_pengawas: string
+  kak_p_konsultan_pengawas: string;
   rab_p_konsultan_pengawas: string;
   hps_uraian_p_konsultan_pengawas: string;
   hps_nilai_p_konsultan_pengawas: string;
@@ -54,35 +54,31 @@ export interface PerencanaanKegiatanReal {
   update_at: string;
 }
 
-
-
-
-  export interface LaporanMingguan {
-   
-id_laporan_pelaksanaan: number;
-    id_pelaksanaan_pengadaan: number;
-    id_realisasi_keuangan: number;
-  minggu_ke: number;
+export interface LaporanMingguan {
+  id_laporan_pelaksanaan: number;
+  id_pelaksanaan_pengadaan: number;
+  id_realisasi_keuangan: number;
+  minggu_ke: string;
   target_fisik: number;
   realisasi_fisik: number;
   deviasi_fisik: number;
+
   tingkat_capaian_keberhasilan: string;
   tindak_lanjut_rekomendasi_sebelumnya: string;
   permasalahan_yang_dihadapi: string;
   rekomendasi: string;
+}
 
-  }
+export interface Termin {
+  id_realisasi_keuangan: number;
+  id_pelaksanaan_pengadaan: number;
+  termin_ke: string;
+  target_keuangan: number;
+  realisasi_keuangan: number;
+  deviasi_keuangan: number;
+  link_dokumen_keuangan: string;
+  created_at: string;
+  update_at: string;
+}
 
-  export interface Termin {
-    id_realisasi_keuangan: number;
-    id_pelaksanaan_pengadaan: number;
-    termin_ke: string;
-    target_keuangan: number;
-    realisasi_keuangan: number;
-    deviasi_keuangan: number;
-    link_dokumen_keuangan: string;
-    created_at: string;
-    update_at: string;
-  }
-
-//jadi data di table itu adalah laporan mingguan yang di join ke pelaksaan dan perencaan kegauatan.  
+//jadi data di table itu adalah laporan mingguan yang di join ke pelaksaan dan perencaan kegauatan.
