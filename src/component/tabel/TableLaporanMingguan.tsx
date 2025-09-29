@@ -8,7 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { Pencil, Trash2, RefreshCw } from "lucide-react";
 import {
   ColumnDef,
   flexRender,
@@ -16,39 +24,33 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { LaporanMingguan } from "../interface/dataReal";
-import { useState } from "react";
+import { LaporanMingguan, Termin } from "../interface/dataReal";
+import { useState, useEffect } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import axios from "axios";
 
-const laporanMingguanMock: LaporanMingguan[] = [
-  {
-    minggu: "M1",
-    target_fisik_perminggu: "10%",
-    minggu_fisik: "M1",
-    realisasi_fisik_perminggu: "8%",
-    deviasi: "-2%",
-    target_realisasi_anggaran_per_termin: "Rp 100.000.000",
-    reaisasi_per_termin: "Rp 80.000.000",
-    sisa_kontrak: "Rp 20.000.000",
-    tingkat_capaiannya_keberhasilan: "80%",
-    tindak_lanjut_rekomendasi_sebelumnya: "Peningkatan pengawasan lapangan",
-    permasalahan: "Keterlambatan pengiriman material",
-    rekomendasi: "Koordinasi ulang dengan vendor material",
-  },
-  {
-    minggu: "M2",
-    target_fisik_perminggu: "20%",
-    minggu_fisik: "M2",
-    realisasi_fisik_perminggu: "18%",
-    deviasi: "-2%",
-    target_realisasi_anggaran_per_termin: "Rp 200.000.000",
-    reaisasi_per_termin: "Rp 170.000.000",
-    sisa_kontrak: "Rp 30.000.000",
-    tingkat_capaiannya_keberhasilan: "85%",
-    tindak_lanjut_rekomendasi_sebelumnya: "Percepatan mobilisasi alat",
-    permasalahan: "Cuaca buruk menghambat pekerjaan",
-    rekomendasi: "Penyesuaian jadwal kerja sore/malam",
-  },
-];
+// Type untuk form realisasi keuangan
+type RealisasiKeuanganFormData = {
+  id_pelaksanaan_pengadaan: number;
+  termin_ke: string;
+  target_keuangan: number;
+  realisasi_keuangan: number;
+  deviasi_keuangan: number;
+  link_dokumen_keuangan: string;
+};
+
+// Type untuk form laporan mingguan
+type LaporanMingguanFormData = {
+  id_pelaksanaan_pengadaan: number;
+  minggu_ke: number;
+  target_fisik: number;
+  realisasi_fisik: number;
+  deviasi_fisik: number;
+  tingkat_capaian_keberhasilan: string;
+  tindak_lanjut_rekomendasi_sebelumnya: string;
+  permasalahan_yang_dihadapi: string;
+  rekomendasi: string;
+};
 
 const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
   {
@@ -59,7 +61,7 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
     header: "Target dan Realisasi Fisik (%)",
     columns: [
       {
-        id: "target_fisik",
+        id: "target_fisik_perminggu",
         header: "Target Fisik",
         columns: [
           {
@@ -67,13 +69,10 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
             header: "Minggu",
           },
           {
-            accessorKey: "target_fisik_perminggu",
+            accessorKey: "target_fisik",
             header: "Target",
           },
-          {
-            accessorKey: "deviasi",
-            header: "Deviasi",
-          },
+        
         ],
       },
       {
@@ -85,35 +84,26 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
             header: "Minggu",
           },
           {
-            accessorKey: "realisasi_fisik_perminggu",
+            accessorKey: "realisasi_fisik",
             header: "Realisasi",
+          },
+            {
+            accessorKey: "deviasi",
+            header: "Deviasi",
           },
         ],
       },
     ],
   },
   {
-    header: "Anggaran",
-    columns: [
-      {
-        accessorKey: "target_realisasi_anggaran_per_termin",
-        header: "Target / Termin",
-      },
-      {
-        accessorKey: "reaisasi_per_termin",
-        header: "Realisasi / Termin",
-      },
-      {
-        accessorKey: "sisa_kontrak",
-        header: "Sisa Kontrak",
-      },
-    ],
+    header: "Termin",
+    accessorKey: "Termin",
   },
   {
     header: "Evaluasi",
     columns: [
       {
-        accessorKey: "tingkat_capaiannya_keberhasilan",
+        accessorKey: "tingkat_capaian_keberhasilan",
         header: "Tingkat Capaian",
       },
       {
@@ -121,7 +111,7 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
         header: "Tindak Lanjut",
       },
       {
-        accessorKey: "permasalahan",
+        accessorKey: "permasalahan_yang_dihadapi",
         header: "Permasalahan",
       },
       {
@@ -132,85 +122,1177 @@ const allColumns = (): ColumnDef<LaporanMingguan, any>[] => [
   },
 ];
 
-export default function TabelMingguan() {
-  const [data] = useState(() => laporanMingguanMock);
+type TabelMingguanProps = {
+  idPelaksaan: string;
+};
 
-  const table = useReactTable({
-    data,
-    columns: allColumns(),
+export default function TabelMingguan({ idPelaksaan }: TabelMingguanProps) {
+  // State untuk data
+  const [dataAnggaran, setDataAnggaran] = useState<Termin[]>([]);
+  const [dataLaporan, setDataLaporan] = useState<LaporanMingguan[]>([]);
+
+  // State untuk loading
+  const [isLoadingAnggaran, setIsLoadingAnggaran] = useState(true);
+  const [isLoadingLaporan, setIsLoadingLaporan] = useState(true);
+
+  // State untuk drawer
+  const [openAnggaran, setOpenAnggaran] = useState(false);
+  const [openLaporan, setOpenLaporan] = useState(false);
+
+  // State untuk form submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingAnggaranId, setEditingAnggaranId] = useState<number | null>(
+    null
+  );
+  const [editingLaporanId, setEditingLaporanId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
+  const baseUrl = "http://103.177.176.202:6402";
+
+  // Setup useForm untuk realisasi anggaran
+  const {
+    register: registerAnggaran,
+    handleSubmit: handleSubmitAnggaran,
+    formState: { errors: errorsAnggaran },
+    reset: resetAnggaran,
+    setValue: setValueAnggaran,
+  } = useForm<RealisasiKeuanganFormData>({
+    defaultValues: {
+      id_pelaksanaan_pengadaan: parseInt(idPelaksaan),
+      termin_ke: "1",
+      target_keuangan: 0,
+      realisasi_keuangan: 0,
+      deviasi_keuangan: 0,
+      link_dokumen_keuangan: "",
+    },
+  });
+
+  // Setup useForm untuk laporan mingguan
+  const {
+    register: registerLaporan,
+    handleSubmit: handleSubmitLaporan,
+    formState: { errors: errorsLaporan },
+    reset: resetLaporan,
+    setValue: setValueLaporan,
+  } = useForm<LaporanMingguanFormData>({
+    defaultValues: {
+      id_pelaksanaan_pengadaan: parseInt(idPelaksaan),
+      minggu_ke: 1,
+      target_fisik: 0,
+      realisasi_fisik: 0,
+      deviasi_fisik: 0,
+      tingkat_capaian_keberhasilan: "",
+      tindak_lanjut_rekomendasi_sebelumnya: "",
+      permasalahan_yang_dihadapi: "",
+      rekomendasi: "",
+    },
+  });
+
+  // State untuk menyimpan nilai saat ini untuk kalkulasi deviasi
+  const [currentTarget, setCurrentTarget] = useState<number>(0);
+  const [currentRealisasi, setCurrentRealisasi] = useState<number>(0);
+
+  // Fetch data anggaran dari API
+  const fetchDataAnggaran = async () => {
+    setIsLoadingAnggaran(true);
+    try {
+      const response = await axios.get(
+        `${baseUrl}/getAllRealisasi?id_pelaksanaan_pengadaan=${idPelaksaan}`
+      );
+      setDataAnggaran(response.data);
+    } catch (error) {
+      console.error("Error fetching data anggaran:", error);
+      alert("Gagal memuat data anggaran");
+      setDataAnggaran([]);
+    } finally {
+      setIsLoadingAnggaran(false);
+    }
+  };
+
+  // Fetch data laporan mingguan dari API
+  const fetchDataLaporan = async () => {
+    setIsLoadingLaporan(true);
+    try {
+      const response = await axios.get(
+        `${baseUrl}/getAllLaporan?id_pelaksanaan_pengadaan=${idPelaksaan}`
+      );
+      setDataLaporan(response.data);
+    } catch (error) {
+      console.error("Error fetching data laporan:", error);
+      alert("Gagal memuat data laporan mingguan");
+      setDataLaporan([]);
+    } finally {
+      setIsLoadingLaporan(false);
+    }
+  };
+
+  // useEffect untuk fetch data saat komponen dimount
+  useEffect(() => {
+    if (idPelaksaan) {
+      fetchDataAnggaran();
+      fetchDataLaporan();
+    }
+  }, [idPelaksaan]);
+
+  // Fungsi untuk handle edit anggaran
+  const handleEditAnggaran = (rowIndex: number) => {
+    const itemToEdit = dataAnggaran[rowIndex];
+
+    setEditingAnggaranId(Number(itemToEdit.id_realisasi_keuangan) || rowIndex);
+
+    // Set form values dengan data yang akan di-edit
+    const targetValue = parseRupiahInput(itemToEdit.target_keuangan);
+    const realisasiValue = parseRupiahInput(itemToEdit.realisasi_keuangan);
+
+    setValueAnggaran("id_pelaksanaan_pengadaan", parseInt(idPelaksaan));
+    setValueAnggaran("termin_ke", itemToEdit.termin_ke);
+    setValueAnggaran("target_keuangan", targetValue);
+    setValueAnggaran("realisasi_keuangan", realisasiValue);
+    setValueAnggaran(
+      "link_dokumen_keuangan",
+      itemToEdit.link_dokumen_keuangan || ""
+    );
+
+    // Set state untuk tampilan
+    setCurrentTarget(targetValue);
+    setCurrentRealisasi(realisasiValue);
+
+    setOpenAnggaran(true);
+  };
+
+  // Fungsi untuk handle edit laporan
+  const handleEditLaporan = (rowIndex: number) => {
+    const itemToEdit = dataLaporan[rowIndex];
+
+    setEditingLaporanId(Number(itemToEdit.id_laporan_pelaksanaan) || rowIndex);
+
+    setValueLaporan("id_pelaksanaan_pengadaan", parseInt(idPelaksaan));
+    setValueLaporan("minggu_ke", itemToEdit.minggu_ke);
+    setValueLaporan(
+      "target_fisik",
+      itemToEdit.target_fisik
+    );
+    setValueLaporan(
+      "realisasi_fisik",
+      itemToEdit.realisasi_fisik
+    );
+    setValueLaporan(
+      "tingkat_capaian_keberhasilan",
+      itemToEdit.tingkat_capaian_keberhasilan || ""
+    );
+    setValueLaporan(
+      "tindak_lanjut_rekomendasi_sebelumnya",
+      itemToEdit.tindak_lanjut_rekomendasi_sebelumnya || ""
+    );
+    setValueLaporan("permasalahan_yang_dihadapi", itemToEdit.permasalahan_yang_dihadapi || "");
+    setValueLaporan("rekomendasi", itemToEdit.rekomendasi || "");
+
+    setOpenLaporan(true);
+  };
+
+  // Fungsi untuk handle delete
+  const handleDelete = async (
+    rowIndex: number,
+    type: "anggaran" | "laporan"
+  ) => {
+    const data = type === "anggaran" ? dataAnggaran : dataLaporan;
+    const item = data[rowIndex];
+
+    const confirmDelete = window.confirm(
+      `Apakah Anda yakin ingin menghapus data ${type} ini?`
+    );
+
+    if (!confirmDelete) return;
+
+    setIsDeleting(rowIndex);
+
+    try {
+      const endpoint =
+        type === "anggaran" ? "realisasi-keuangan" : "laporan-mingguan";
+      const itemId = Number(item) || rowIndex + 1;
+
+      const response = await axios.delete(`/api/${endpoint}/${itemId}`);
+
+      if (response.status === 200) {
+        alert("Data berhasil dihapus!");
+        // Refresh data setelah delete
+        if (type === "anggaran") {
+          fetchDataAnggaran();
+        } else {
+          fetchDataLaporan();
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting data:", error);
+
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Terjadi kesalahan saat menghapus data";
+        alert(`Error: ${errorMessage}`);
+      } else {
+        alert("Terjadi kesalahan yang tidak terduga");
+      }
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  // Fungsi untuk menghitung deviasi otomatis
+  const calculateDeviasi = (target: number, realisasi: number): number => {
+    if (target === 0) return 0;
+    return ((realisasi - target) / target) * 100;
+  };
+
+  // Fungsi untuk format Rupiah
+  const formatRupiah = (value: number): string => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  // Fungsi untuk parse nilai input menjadi number
+  const parseRupiahInput = (value: any): number => {
+    const stringValue = String(value || "");
+    const numericValue = stringValue.replace(/[^\d]/g, "");
+    return numericValue ? parseInt(numericValue) : 0;
+  };
+
+  // Kolom untuk tabel anggaran dengan aksi
+  const allColumnsAnggaran = (): ColumnDef<Termin, any>[] => [
+    {
+      header: "No",
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      header: "Anggaran",
+      columns: [
+        {
+          accessorKey: "termin_ke",
+          header: "Termin",
+        },
+        {
+          accessorKey: "target_keuangan",
+          header: "Target",
+          cell: ({ getValue }) => {
+            const value = getValue() as string;
+            return value || "-";
+          },
+        },
+        {
+          accessorKey: "realisasi_keuangan",
+          header: "Realisasi",
+          cell: ({ getValue }) => {
+            const value = getValue() as string;
+            return value || "-";
+          },
+        },
+        {
+          accessorKey: "sisa_kontrak",
+          header: "Sisa Kontrak",
+          cell: ({ getValue }) => {
+            const value = getValue() as string;
+            return value || "-";
+          },
+        },
+      ],
+    },
+    {
+      header: "Aksi",
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleEditAnggaran(row.index)}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleDelete(row.index, "anggaran")}
+            disabled={isDeleting === row.index}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            {isDeleting === row.index ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  // Kolom untuk tabel laporan dengan aksi
+  const allColumnsLaporan = (): ColumnDef<LaporanMingguan, any>[] => [
+    ...allColumns(),
+    {
+      header: "Aksi",
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleEditLaporan(row.index)}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleDelete(row.index, "laporan")}
+            disabled={isDeleting === row.index}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            {isDeleting === row.index ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  // Submit handler untuk anggaran
+  const onSubmitAnggaran: SubmitHandler<RealisasiKeuanganFormData> = async (
+    data
+  ) => {
+    setIsSubmitting(true);
+
+    try {
+      const deviasi = calculateDeviasi(currentTarget, currentRealisasi);
+
+      const payload = {
+        ...data,
+        target_keuangan: currentTarget,
+        realisasi_keuangan: currentRealisasi,
+        deviasi_keuangan: deviasi,
+      };
+
+      let response;
+
+      if (editingAnggaranId !== null) {
+        response = await axios.put(
+          `${baseUrl}/updateRealisasi?id=${editingAnggaranId}`,
+          payload,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      } else {
+        response = await axios.post(`${baseUrl}/createRealisasi`, payload, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (response.status === 200 || response.status === 201) {
+        alert(
+          editingAnggaranId !== null
+            ? "Data berhasil diperbarui!"
+            : "Data realisasi keuangan berhasil disimpan!"
+        );
+        resetAnggaran();
+        setCurrentTarget(0);
+        setCurrentRealisasi(0);
+        setEditingAnggaranId(null);
+        setOpenAnggaran(false);
+        fetchDataAnggaran(); // Refresh data
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Terjadi kesalahan saat menyimpan data";
+        alert(`Error: ${errorMessage}`);
+      } else {
+        alert("Terjadi kesalahan yang tidak terduga");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Submit handler untuk laporan
+  const onSubmitLaporan: SubmitHandler<LaporanMingguanFormData> = async (
+    data
+  ) => {
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        ...data,
+        deviasi: calculateDeviasi(
+          data.target_fisik,
+          data.realisasi_fisik
+        ),
+      };
+
+      let response;
+
+      if (editingLaporanId !== null) {
+        response = await axios.put(
+          `${baseUrl}/updateLaporan?id=${editingLaporanId}`,
+          payload,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      } else {
+        response = await axios.post(`${baseUrl}/createLaporan`, payload, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (response.status === 200 || response.status === 201) {
+        alert(
+          editingLaporanId !== null
+            ? "Data berhasil diperbarui!"
+            : "Data laporan mingguan berhasil disimpan!"
+        );
+        resetLaporan();
+        setEditingLaporanId(null);
+        setOpenLaporan(false);
+        fetchDataLaporan(); // Refresh data
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Terjadi kesalahan saat menyimpan data";
+        alert(`Error: ${errorMessage}`);
+      } else {
+        alert("Terjadi kesalahan yang tidak terduga");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Setup tables
+  const tableAnggaran = useReactTable<Termin>({
+    data: dataAnggaran,
+    columns: allColumnsAnggaran(),
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const tableLaporan = useReactTable<LaporanMingguan>({
+    data: dataLaporan,
+    columns: allColumnsLaporan(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
-    <div className="rounded-2xl border shadow-sm p-2 space-y-4 max-w-[95vw] overflow-x-auto">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  colSpan={header.colSpan}
-                  className="text-center align-middle border px-2 py-1 font-semibold"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
+    <>
+      {/* Section Realisasi Anggaran */}
+      <div className="rounded-2xl border shadow-sm p-2 space-y-4 max-w-[95vw] overflow-x-auto">
+        <div className="flex justify-between items-center">
+          <h1>Realisasi Anggaran Per Termin</h1>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={fetchDataAnggaran}
+            disabled={isLoadingAnggaran}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${
+                isLoadingAnggaran ? "animate-spin" : ""
+              }`}
+            />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Drawer untuk Anggaran */}
+        <Drawer
+          open={openAnggaran}
+          onOpenChange={(newOpen) => {
+            setOpenAnggaran(newOpen);
+            if (!newOpen) {
+              setEditingAnggaranId(null);
+              setCurrentTarget(0);
+              setCurrentRealisasi(0);
+              resetAnggaran();
+            }
+          }}
+        >
+          <DrawerTrigger asChild>
+            <Button>Tambahkan Realisasi Anggaran</Button>
+          </DrawerTrigger>
+
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>
+                {editingAnggaranId !== null
+                  ? "Edit Realisasi Anggaran"
+                  : "Form Realisasi Anggaran"}
+              </DrawerTitle>
+            </DrawerHeader>
+
+            <form
+              onSubmit={handleSubmitAnggaran(onSubmitAnggaran)}
+              className="p-4 space-y-4"
+            >
+              <input
+                type="hidden"
+                {...registerAnggaran("id_pelaksanaan_pengadaan")}
+              />
+
+              {/* Termin Ke */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Termin Ke <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="Masukkan termin ke-..."
+                  className={`border rounded w-full px-3 py-2 ${
+                    errorsAnggaran.termin_ke
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  {...registerAnggaran("termin_ke", {
+                    required: "Termin wajib diisi",
+                    min: { value: 1, message: "Termin minimal 1" },
+                  })}
+                />
+                {errorsAnggaran.termin_ke && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsAnggaran.termin_ke.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Target Keuangan */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Target Keuangan <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="0"
+                    className={`border rounded w-full pl-8 pr-3 py-2 ${
+                      errorsAnggaran.target_keuangan
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerAnggaran("target_keuangan", {
+                      required: "Target keuangan wajib diisi",
+                      min: {
+                        value: 0,
+                        message: "Target keuangan tidak boleh negatif",
+                      },
+                      setValueAs: (value) => parseRupiahInput(value),
+                    })}
+                    onChange={(e) => {
+                      const numericValue = parseRupiahInput(e.target.value);
+                      e.target.value =
+                        numericValue > 0
+                          ? numericValue.toLocaleString("id-ID")
+                          : "";
+                      setCurrentTarget(numericValue);
+                      setValueAnggaran("target_keuangan", numericValue);
+                    }}
+                    onBlur={(e) => {
+                      const numericValue = parseRupiahInput(e.target.value);
+                      e.target.value =
+                        numericValue > 0
+                          ? numericValue.toLocaleString("id-ID")
+                          : "";
+                      setCurrentTarget(numericValue);
+                      setValueAnggaran("target_keuangan", numericValue);
+                    }}
+                  />
+                </div>
+                {errorsAnggaran.target_keuangan && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsAnggaran.target_keuangan.message}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Nilai: {formatRupiah(currentTarget || 0)}
+                </p>
+              </div>
+
+              {/* Realisasi Keuangan */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Realisasi Keuangan <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="0"
+                    className={`border rounded w-full pl-8 pr-3 py-2 ${
+                      errorsAnggaran.realisasi_keuangan
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerAnggaran("realisasi_keuangan", {
+                      required: "Realisasi keuangan wajib diisi",
+                      min: {
+                        value: 0,
+                        message: "Realisasi keuangan tidak boleh negatif",
+                      },
+                      setValueAs: (value) => parseRupiahInput(value),
+                    })}
+                    onChange={(e) => {
+                      const numericValue = parseRupiahInput(e.target.value);
+                      e.target.value =
+                        numericValue > 0
+                          ? numericValue.toLocaleString("id-ID")
+                          : "";
+                      setCurrentRealisasi(numericValue);
+                      setValueAnggaran("realisasi_keuangan", numericValue);
+                    }}
+                    onBlur={(e) => {
+                      const numericValue = parseRupiahInput(e.target.value);
+                      e.target.value =
+                        numericValue > 0
+                          ? numericValue.toLocaleString("id-ID")
+                          : "";
+                      setCurrentRealisasi(numericValue);
+                      setValueAnggaran("realisasi_keuangan", numericValue);
+                    }}
+                  />
+                </div>
+                {errorsAnggaran.realisasi_keuangan && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsAnggaran.realisasi_keuangan.message}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Nilai: {formatRupiah(currentRealisasi || 0)}
+                </p>
+              </div>
+
+              {/* Deviasi Keuangan (Otomatis dihitung) */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Deviasi Keuangan (%)
+                </label>
+                <input
+                  type="text"
+                  value={
+                    calculateDeviasi(
+                      currentTarget || 0,
+                      currentRealisasi || 0
+                    ).toFixed(2) + "%"
+                  }
+                  className="border rounded w-full px-3 py-2 bg-gray-100"
+                  readOnly
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Deviasi dihitung otomatis: ((Realisasi - Target) / Target) ×
+                  100%
+                </p>
+                <p className="text-xs mt-1">
+                  {currentTarget > 0 && currentRealisasi > 0 && (
+                    <span
+                      className={
+                        calculateDeviasi(currentTarget, currentRealisasi) >= 0
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {calculateDeviasi(currentTarget, currentRealisasi) >= 0
+                        ? "✓ Surplus"
+                        : "⚠️ Defisit"}
+                      :{" "}
+                      {formatRupiah(Math.abs(currentRealisasi - currentTarget))}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              {/* Link Dokumen Keuangan */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Link Dokumen Keuangan
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/dokumen.pdf"
+                  className={`border rounded w-full px-3 py-2 ${
+                    errorsAnggaran.link_dokumen_keuangan
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  {...registerAnggaran("link_dokumen_keuangan", {
+                    pattern: {
+                      value:
+                        /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                      message: "Format URL tidak valid",
+                    },
+                  })}
+                />
+                {errorsAnggaran.link_dokumen_keuangan && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsAnggaran.link_dokumen_keuangan.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting
+                  ? editingAnggaranId !== null
+                    ? "Memperbarui..."
+                    : "Menyimpan..."
+                  : editingAnggaranId !== null
+                  ? "Perbarui"
+                  : "Simpan"}
+              </Button>
+            </form>
+          </DrawerContent>
+        </Drawer>
+
+        {/* Tabel Anggaran */}
+        {isLoadingAnggaran ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2">Memuat data anggaran...</span>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              {tableAnggaran.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="text-center align-middle border px-2 py-1 font-semibold"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
+            </TableHeader>
 
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
+            <TableBody>
+              {tableAnggaran.getRowModel().rows.length ? (
+                tableAnggaran.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="border px-2 py-1 text-sm"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
                   <TableCell
-                    key={cell.id}
-                    className="border px-2 py-1 text-sm"
+                    colSpan={allColumnsAnggaran().length}
+                    className="text-center py-8 text-gray-500"
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    Tidak ada data anggaran
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={allColumns().length} className="text-center">
-                Tidak ada data
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
 
-      {/* Pagination */}
-      <div className="flex justify-end space-x-2 mt-2">
-        <Button
-          size="sm"
-          onClick={() =>
-            table.setPageIndex(table.getState().pagination.pageIndex - 1)
-          }
-          disabled={!table.getCanPreviousPage()}
-        >
-          Prev
-        </Button>
-        <Button
-          size="sm"
-          onClick={() =>
-            table.setPageIndex(table.getState().pagination.pageIndex + 1)
-          }
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+        {/* Pagination Anggaran */}
+        {!isLoadingAnggaran && dataAnggaran.length > 0 && (
+          <div className="flex justify-end space-x-2 mt-2">
+            <Button
+              size="sm"
+              onClick={() =>
+                tableAnggaran.setPageIndex(
+                  tableAnggaran.getState().pagination.pageIndex - 1
+                )
+              }
+              disabled={!tableAnggaran.getCanPreviousPage()}
+            >
+              Prev
+            </Button>
+            <Button
+              size="sm"
+              onClick={() =>
+                tableAnggaran.setPageIndex(
+                  tableAnggaran.getState().pagination.pageIndex + 1
+                )
+              }
+              disabled={!tableAnggaran.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* Section Laporan Mingguan */}
+      <div className="rounded-2xl border shadow-sm p-2 space-y-4 max-w-[95vw] overflow-x-auto">
+        <div className="flex justify-between items-center">
+          <h1>Realisasi Fisik dan Evaluasi</h1>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={fetchDataLaporan}
+            disabled={isLoadingLaporan}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${
+                isLoadingLaporan ? "animate-spin" : ""
+              }`}
+            />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Drawer untuk Laporan Mingguan */}
+        <Drawer
+          open={openLaporan}
+          onOpenChange={(newOpen) => {
+            setOpenLaporan(newOpen);
+            if (!newOpen) {
+              setEditingLaporanId(null);
+              resetLaporan();
+            }
+          }}
+        >
+          <DrawerTrigger asChild>
+            <Button>Tambahkan Laporan Mingguan</Button>
+          </DrawerTrigger>
+
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>
+                {editingLaporanId !== null
+                  ? "Edit Laporan Mingguan"
+                  : "Form Laporan Mingguan"}
+              </DrawerTitle>
+            </DrawerHeader>
+
+            <form
+              onSubmit={handleSubmitLaporan(onSubmitLaporan)}
+              className="p-4 space-y-4"
+            >
+              <input
+                type="hidden"
+                {...registerLaporan("id_pelaksanaan_pengadaan")}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Minggu */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Minggu <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Masukkan minggu ke-..."
+                    className={`border rounded w-full px-3 py-2 ${
+                      errorsLaporan.minggu_ke
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerLaporan("minggu_ke", {
+                      required: "Minggu wajib diisi",
+                      min: { value: 1, message: "Minggu minimal 1" },
+                    })}
+                  />
+                  {errorsLaporan.minggu_ke && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errorsLaporan.minggu_ke.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Target Fisik Per Minggu */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Target Fisik Per Minggu (%){" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    placeholder="0.00"
+                    className={`border rounded w-full px-3 py-2 ${
+                      errorsLaporan.target_fisik
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerLaporan("target_fisik", {
+                      required: "Target fisik wajib diisi",
+                      min: {
+                        value: 0,
+                        message: "Target fisik tidak boleh negatif",
+                      },
+                      max: {
+                        value: 100,
+                        message: "Target fisik maksimal 100%",
+                      },
+                    })}
+                  />
+                  {errorsLaporan.target_fisik && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errorsLaporan.target_fisik.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Realisasi Fisik Per Minggu */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Realisasi Fisik Per Minggu (%){" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    placeholder="0.00"
+                    className={`border rounded w-full px-3 py-2 ${
+                      errorsLaporan.realisasi_fisik
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    {...registerLaporan("realisasi_fisik", {
+                      required: "Realisasi fisik wajib diisi",
+                      min: {
+                        value: 0,
+                        message: "Realisasi fisik tidak boleh negatif",
+                      },
+                      max: {
+                        value: 100,
+                        message: "Realisasi fisik maksimal 100%",
+                      },
+                    })}
+                  />
+                  {errorsLaporan.realisasi_fisik && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errorsLaporan.realisasi_fisik.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {/* Tingkat Capaian Keberhasilan */}
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Tingkat Capaian Keberhasilan{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Masukkan tingkat capaian keberhasilan..."
+                  className={`border rounded w-full px-3 py-2 resize-vertical ${
+                    errorsLaporan.tingkat_capaian_keberhasilan
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  {...registerLaporan("tingkat_capaian_keberhasilan", {
+                    required: "Tingkat capaian keberhasilan wajib diisi",
+                  })}
+                />
+                {errorsLaporan.tingkat_capaian_keberhasilan && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsLaporan.tingkat_capaian_keberhasilan.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Tindak Lanjut Rekomendasi Sebelumnya */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Tindak Lanjut Rekomendasi Sebelumnya
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Masukkan tindak lanjut rekomendasi sebelumnya..."
+                  className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
+                  {...registerLaporan("tindak_lanjut_rekomendasi_sebelumnya")}
+                />
+              </div>
+           </div>
+
+              {/* Permasalahan */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Permasalahan
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Masukkan permasalahan yang dihadapi..."
+                  className="border rounded w-full px-3 py-2 border-gray-300 resize-vertical"
+                  {...registerLaporan("permasalahan_yang_dihadapi")}
+                />
+              </div>
+
+              {/* Rekomendasi */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Rekomendasi <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Masukkan rekomendasi..."
+                  className={`border rounded w-full px-3 py-2 resize-vertical ${
+                    errorsLaporan.rekomendasi
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  {...registerLaporan("rekomendasi", {
+                    required: "Rekomendasi wajib diisi",
+                  })}
+                />
+                {errorsLaporan.rekomendasi && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsLaporan.rekomendasi.message}
+                  </p>
+                )}
+              </div>
+
+            </div>
+              {/* Submit Button */}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting
+                  ? editingLaporanId !== null
+                    ? "Memperbarui..."
+                    : "Menyimpan..."
+                  : editingLaporanId !== null
+                  ? "Perbarui"
+                  : "Simpan"}
+              </Button>
+            </form>
+          </DrawerContent>
+        </Drawer>
+
+        {/* Tabel Laporan */}
+        {isLoadingLaporan ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2">Memuat data laporan mingguan...</span>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              {tableLaporan.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="text-center align-middle border px-2 py-1 font-semibold"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+
+            <TableBody>
+              {tableLaporan.getRowModel().rows.length ? (
+                tableLaporan.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="border px-2 py-1 text-sm"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={allColumnsLaporan().length}
+                    className="text-center py-8 text-gray-500"
+                  >
+                    Tidak ada data laporan mingguan
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
+
+        {/* Pagination Laporan */}
+        {!isLoadingLaporan && dataLaporan.length > 0 && (
+          <div className="flex justify-end space-x-2 mt-2">
+            <Button
+              size="sm"
+              onClick={() =>
+                tableLaporan.setPageIndex(
+                  tableLaporan.getState().pagination.pageIndex - 1
+                )
+              }
+              disabled={!tableLaporan.getCanPreviousPage()}
+            >
+              Prev
+            </Button>
+            <Button
+              size="sm"
+              onClick={() =>
+                tableLaporan.setPageIndex(
+                  tableLaporan.getState().pagination.pageIndex + 1
+                )
+              }
+              disabled={!tableLaporan.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

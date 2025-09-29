@@ -58,23 +58,31 @@ export interface PerencanaanKegiatanReal {
 
 
   export interface LaporanMingguan {
-
-    minggu: string;
-    target_fisik_perminggu: string; // persen
-    minggu_fisik:string
-    realisasi_fisik_perminggu: string; // persen
-    deviasi: string;
-
-    target_realisasi_anggaran_per_termin: string;
-    reaisasi_per_termin: string;
-    sisa_kontrak: string;
-
-    tingkat_capaiannya_keberhasilan: string;
-    tindak_lanjut_rekomendasi_sebelumnya: string;
-    permasalahan: string;
-    rekomendasi: string;
+   
+id_laporan_pelaksanaan: number;
+    id_pelaksanaan_pengadaan: number;
+    id_realisasi_keuangan: number;
+  minggu_ke: number;
+  target_fisik: number;
+  realisasi_fisik: number;
+  deviasi_fisik: number;
+  tingkat_capaian_keberhasilan: string;
+  tindak_lanjut_rekomendasi_sebelumnya: string;
+  permasalahan_yang_dihadapi: string;
+  rekomendasi: string;
 
   }
 
+  export interface Termin {
+    id_realisasi_keuangan: number;
+    id_pelaksanaan_pengadaan: number;
+    termin_ke: string;
+    target_keuangan: number;
+    realisasi_keuangan: number;
+    deviasi_keuangan: number;
+    link_dokumen_keuangan: string;
+    created_at: string;
+    update_at: string;
+  }
 
 //jadi data di table itu adalah laporan mingguan yang di join ke pelaksaan dan perencaan kegauatan.  
