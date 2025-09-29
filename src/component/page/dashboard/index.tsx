@@ -637,10 +637,10 @@ const DashboardPages: React.FC = () => {
         <div className="max-w-full mx-auto">
           <div className="mb-4 md:mb-6">
             <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-1 md:mb-2">
-              Dashboard Modernisasi Sarpras Pendidikan Kp
+              Dashboard Modernisasi Sarpras Pendidikan KP
             </h1>
             <p className="text-sm md:text-base text-gray-600">
-              Monitoring kegiatan Modernisasi Sarpras Pendidikan Kp
+              Monitoring kegiatan Modernisasi Sarpras Pendidikan KP
             </p>
 
             {userRole === "Admin Pusat" && (
