@@ -526,7 +526,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
                   ) : (
                     <div className="p-8 text-center text-gray-500">
                       <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian "{searchQuery}"</p>
+                      <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian {searchQuery}</p>
                     </div>
                   )}
                 </div>
@@ -680,7 +680,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
                 ) : (
                   <div className="p-8 text-center text-gray-500">
                     <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian "{searchQuery}"</p>
+                    <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian {searchQuery}</p>
                   </div>
                 )}
 
