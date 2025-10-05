@@ -20,6 +20,7 @@ import { getCookie } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { Dashboard1 } from "@/component/interface/dataDashboard";
 import axios from "axios";
+import DashboardKontrak from "./test";
 
 interface Activity {
   nama_pekerjaan: string;
@@ -942,6 +943,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
               </Card>
             </div>
           </div>
+           <DashboardKontrak />
 
           {/* Project Cards */}
           {dataDashboard2 && dataDashboard2.length > 0 ? (
@@ -978,6 +980,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
           )}
         </div>
       </div>
+      <DashboardKontrak />
     </Mainlayout>
   );
 };
