@@ -253,35 +253,7 @@ const DashboardPages: React.FC = () => {
     }).format(numericAmount);
   };
 
-  const toggleCardExpansion = (projectId: string) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [projectId]: !prev[projectId],
-    }));
-  };
-
-  const goToPage = (page: number) => {
-    setCurrentPage(
-      Math.max(
-        1,
-        Math.min(
-          page,
-          Math.ceil((dataDashboard2[0]?.activities?.length || 0) / itemsPerPage)
-        )
-      )
-    );
-  };
-
-  const goToPrevious = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  };
-
-  const goToNext = () => {
-    const totalPages = Math.ceil(
-      (dataDashboard2[0]?.activities?.length || 0) / itemsPerPage
-    );
-    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-  };
+ 
   interface ProjectData {
   id?: string;
   title: string;
