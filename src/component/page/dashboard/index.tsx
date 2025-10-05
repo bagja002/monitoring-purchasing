@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
+  Search,
 } from "lucide-react";
 import Mainlayout from "@/component/layout";
 import SelectSatdik from "@/component/dropdown/satdikDropdown";
@@ -67,7 +68,7 @@ const DashboardPages: React.FC = () => {
 
   // Function untuk get cookie - dipindahkan ke luar component atau gunakan yang dari cookies-next
   const getCookieLocal = (name: string): string | null => {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
@@ -200,14 +201,14 @@ const DashboardPages: React.FC = () => {
           // Add id to each project if not exists
           const projectsWithId = dashboardData2.map((project, index) => ({
             ...project,
-            id: project.id || `project-${index}`
+            id: project.id || `project-${index}`,
           }));
           setDataDashboard2(projectsWithId);
         } else {
           console.warn("No valid project data received");
           setDataDashboard2([]);
         }
-       
+
         setDataDashboard1({
           ...dashboardData,
           total_anggaran: dashboardData.total_anggaran,
@@ -235,11 +236,14 @@ const DashboardPages: React.FC = () => {
 
   const formatCurrency = (amount: string | number): string => {
     if (!amount && amount !== 0) return "Rp 0";
-    
-    const numericAmount = typeof amount === 'string' ? parseFloat(amount.replace(/[^0-9.-]+/g,"")) : amount;
-    
+
+    const numericAmount =
+      typeof amount === "string"
+        ? parseFloat(amount.replace(/[^0-9.-]+/g, ""))
+        : amount;
+
     if (isNaN(numericAmount)) return "Rp 0";
-    
+
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -256,7 +260,15 @@ const DashboardPages: React.FC = () => {
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, Math.ceil((dataDashboard2[0]?.activities?.length || 0) / itemsPerPage))));
+    setCurrentPage(
+      Math.max(
+        1,
+        Math.min(
+          page,
+          Math.ceil((dataDashboard2[0]?.activities?.length || 0) / itemsPerPage)
+        )
+      )
+    );
   };
 
   const goToPrevious = () => {
@@ -264,21 +276,75 @@ const DashboardPages: React.FC = () => {
   };
 
   const goToNext = () => {
-    const totalPages = Math.ceil((dataDashboard2[0]?.activities?.length || 0) / itemsPerPage);
+    const totalPages = Math.ceil(
+      (dataDashboard2[0]?.activities?.length || 0) / itemsPerPage
+    );
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   };
+  interface ProjectData {
+  id?: string;
+  title: string;
+  total_value: number;
+  activities?: Activity[];
+}
 
-  const ProjectCard: React.FC<{ project: ProjectData; projectIndex: number }> = ({ project, projectIndex }) => {
+interface ProjectCardProps {
+  project: ProjectData;
+  projectIndex: number;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
+    const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
+    const itemsPerPage = 5;
+    
     const isExpanded = expandedCards[project.id || ''] || false;
     
-    // Pagination calculations for this specific project
-    const activities = project.activities || [];
-    const totalItems = activities.length;
+    // Filter activities based on search query
+    const filteredActivities = useMemo(() => {
+      const activities = project.activities || [];
+      if (!searchQuery.trim()) return activities;
+      
+      const query = searchQuery.toLowerCase();
+      return activities.filter(activity => 
+        activity.nama_pekerjaan?.toLowerCase().includes(query) ||
+        activity.pic?.toLowerCase().includes(query) ||
+        activity.namaKontraktor?.toLowerCase().includes(query)
+      );
+    }, [project.activities, searchQuery]);
+    
+    // Reset to first page when search query changes
+    React.useEffect(() => {
+      setCurrentPage(1);
+    }, [searchQuery]);
+    
+    // Pagination calculations for filtered activities
+    const totalItems = filteredActivities.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentActivities = activities.slice(startIndex, endIndex);
-    const hasActivities = activities.length > 0;
+    const currentActivities = filteredActivities.slice(startIndex, endIndex);
+    const hasActivities = (project.activities || []).length > 0;
+
+    const toggleCardExpansion = (cardId: string) => {
+      setExpandedCards(prev => ({
+        ...prev,
+        [cardId]: !prev[cardId]
+      }));
+    };
+
+    const goToPrevious = () => {
+      if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    const goToNext = () => {
+      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const goToPage = (page: number) => {
+      setCurrentPage(page);
+    };
 
     return (
       <Card className="w-full shadow-lg mb-4 md:mb-6">
@@ -381,7 +447,7 @@ const DashboardPages: React.FC = () => {
                 <span className="text-xs md:text-sm">Export Data PDF</span>
               </Button>
               <div className="sm:ml-4">
-                <span className="text-xs md:text-sm text-gray-600">Nilai Total Kegiatan</span>
+                <span className="text-xs md:text-sm text-gray-600">Anggaran Total Kegiatan</span>
                 <div className="text-lg md:text-xl font-bold">
                   {formatCurrency(project.total_value)}
                 </div>
@@ -398,6 +464,33 @@ const DashboardPages: React.FC = () => {
             </div>
           ) : (
             <>
+              {/* Search Bar - Added Feature */}
+              <div className="p-3 md:p-4 bg-white border-b">
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Cari berdasarkan pekerjaan, PIC, atau kontraktor..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <div className="mt-2 text-xs text-gray-600">
+                    Ditemukan {filteredActivities.length} kegiatan dari {project.activities?.length || 0} total kegiatan
+                  </div>
+                )}
+              </div>
+
               {/* Desktop Table */}
               <div className="hidden md:block">
                 <div className="bg-gray-50 border-b">
@@ -411,51 +504,58 @@ const DashboardPages: React.FC = () => {
                 </div>
 
                 <div className="bg-white">
-                  {currentActivities.map((activity, activityIndex) => (
-                    <div key={startIndex + activityIndex} className="grid grid-cols-5 gap-1 p-3 text-sm border-b hover:bg-gray-50">
-                      <div className="font-medium">{activity.nama_pekerjaan}</div>
-                      <div>
-                        <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
-                          {activity.pic}
-                        </Badge>
-                      </div>
-                      <div className="text-gray-600">{activity.namaKontraktor || '-'}</div>
-                      <div>
-                        <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Anggaran</span>
-                            <span>0</span>
+                  {currentActivities.length > 0 ? (
+                    currentActivities.map((activity, activityIndex) => (
+                      <div key={startIndex + activityIndex} className="grid grid-cols-5 gap-1 p-3 text-sm border-b hover:bg-gray-50">
+                        <div className="font-medium">{activity.nama_pekerjaan}</div>
+                        <div>
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
+                            {activity.pic}
+                          </Badge>
+                        </div>
+                        <div className="text-gray-600">{activity.namaKontraktor || '-'}</div>
+                        <div>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Anggaran</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Realisasi</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Deviasi</span>
+                              <span className="text-red-600">0</span>
+                            </div>
+                            <div className="text-center font-semibold mt-2">0%</div>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Realisasi</span>
-                            <span>0</span>
+                        </div>
+                        <div>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Target</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Realisasi</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Deviasi</span>
+                              <span className="text-red-600">0</span>
+                            </div>
+                            <div className="text-center font-semibold mt-2">0%</div>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Deviasi</span>
-                            <span className="text-red-600">0</span>
-                          </div>
-                          <div className="text-center font-semibold mt-2">0%</div>
                         </div>
                       </div>
-                      <div>
-                        <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Target</span>
-                            <span>0</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Realisasi</span>
-                            <span>0</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Deviasi</span>
-                            <span className="text-red-600">0</span>
-                          </div>
-                          <div className="text-center font-semibold mt-2">0%</div>
-                        </div>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian "{searchQuery}"</p>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 {/* Desktop Pagination */}
@@ -470,19 +570,77 @@ const DashboardPages: React.FC = () => {
                           <ChevronLeft className="w-4 h-4" />
                         </Button>
                         <div className="flex space-x-1">
-                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <Button
-                              key={page}
-                              variant={currentPage === page ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => goToPage(page)}
-                              className={`w-8 h-8 p-0 ${
-                                currentPage === page ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-gray-100"
-                              }`}
-                            >
-                              {page}
-                            </Button>
-                          ))}
+                          {(() => {
+                            const pages = [];
+                            const showEllipsisStart = currentPage > 3;
+                            const showEllipsisEnd = currentPage < totalPages - 2;
+                            
+                            // Always show first page
+                            pages.push(
+                              <Button
+                                key={1}
+                                variant={currentPage === 1 ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => goToPage(1)}
+                                className={`w-8 h-8 p-0 ${
+                                  currentPage === 1 ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-gray-100"
+                                }`}
+                              >
+                                1
+                              </Button>
+                            );
+                            
+                            // Show ellipsis if needed
+                            if (showEllipsisStart && currentPage > 4) {
+                              pages.push(
+                                <span key="ellipsis-start" className="px-2 text-gray-400">...</span>
+                              );
+                            }
+                            
+                            // Show pages around current page
+                            for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                              if (i === 1 || i === totalPages) continue;
+                              pages.push(
+                                <Button
+                                  key={i}
+                                  variant={currentPage === i ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => goToPage(i)}
+                                  className={`w-8 h-8 p-0 ${
+                                    currentPage === i ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-gray-100"
+                                  }`}
+                                >
+                                  {i}
+                                </Button>
+                              );
+                            }
+                            
+                            // Show ellipsis if needed
+                            if (showEllipsisEnd && currentPage < totalPages - 3) {
+                              pages.push(
+                                <span key="ellipsis-end" className="px-2 text-gray-400">...</span>
+                              );
+                            }
+                            
+                            // Always show last page if there's more than 1 page
+                            if (totalPages > 1) {
+                              pages.push(
+                                <Button
+                                  key={totalPages}
+                                  variant={currentPage === totalPages ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => goToPage(totalPages)}
+                                  className={`w-8 h-8 p-0 ${
+                                    currentPage === totalPages ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-gray-100"
+                                  }`}
+                                >
+                                  {totalPages}
+                                </Button>
+                              );
+                            }
+                            
+                            return pages;
+                          })()}
                         </div>
                         <Button variant="outline" size="sm" onClick={goToNext} disabled={currentPage === totalPages} className="p-2">
                           <ChevronRight className="w-4 h-4" />
@@ -495,56 +653,63 @@ const DashboardPages: React.FC = () => {
 
               {/* Mobile Card View */}
               <div className={`md:hidden bg-white ${isExpanded ? "block" : "hidden"}`}>
-                {currentActivities.map((activity, activityIndex) => (
-                  <div key={startIndex + activityIndex} className="p-4 border-b border-gray-200">
-                    <div className="space-y-3">
-                      <div>
-                        <div className="text-xs text-gray-500 mb-1">Ruang Lingkup</div>
-                        <div className="font-semibold text-sm">{activity.nama_pekerjaan}</div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
+                {currentActivities.length > 0 ? (
+                  currentActivities.map((activity, activityIndex) => (
+                    <div key={startIndex + activityIndex} className="p-4 border-b border-gray-200">
+                      <div className="space-y-3">
                         <div>
-                          <div className="text-xs text-gray-500 mb-1">PIC</div>
-                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
-                            {activity.pic}
-                          </Badge>
+                          <div className="text-xs text-gray-500 mb-1">Ruang Lingkup</div>
+                          <div className="font-semibold text-sm">{activity.nama_pekerjaan}</div>
                         </div>
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Kontraktor</div>
-                          <div className="text-sm text-gray-700">{activity.namaKontraktor || '-'}</div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-2">Progress Keuangan</div>
-                          <div className="space-y-1 text-xs">
-                            <div className="flex justify-between"><span>Anggaran</span><span>0</span></div>
-                            <div className="flex justify-between"><span>Realisasi</span><span>0</span></div>
-                            <div className="flex justify-between"><span>Deviasi</span><span className="text-red-600">0</span></div>
-                            <div className="text-center font-semibold">0%</div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">PIC</div>
+                            <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
+                              {activity.pic}
+                            </Badge>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Kontraktor</div>
+                            <div className="text-sm text-gray-700">{activity.namaKontraktor || '-'}</div>
                           </div>
                         </div>
-                        <div>
-                          <div className="text-xs text-gray-500 mb-2">Progress Fisik</div>
-                          <div className="space-y-1 text-xs">
-                            <div className="flex justify-between"><span>Target</span><span>0</span></div>
-                            <div className="flex justify-between"><span>Realisasi</span><span>0</span></div>
-                            <div className="flex justify-between"><span>Deviasi</span><span className="text-red-600">0</span></div>
-                            <div className="text-center font-semibold">0%</div>
+                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+                          <div>
+                            <div className="text-xs text-gray-500 mb-2">Progress Keuangan</div>
+                            <div className="space-y-1 text-xs">
+                              <div className="flex justify-between"><span>Anggaran</span><span>0</span></div>
+                              <div className="flex justify-between"><span>Realisasi</span><span>0</span></div>
+                              <div className="flex justify-between"><span>Deviasi</span><span className="text-red-600">0</span></div>
+                              <div className="text-center font-semibold">0%</div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-2">Progress Fisik</div>
+                            <div className="space-y-1 text-xs">
+                              <div className="flex justify-between"><span>Target</span><span>0</span></div>
+                              <div className="flex justify-between"><span>Realisasi</span><span>0</span></div>
+                              <div className="flex justify-between"><span>Deviasi</span><span className="text-red-600">0</span></div>
+                              <div className="text-center font-semibold">0%</div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex gap-2 pt-2">
-                        <Button size="sm" className="flex-1 bg-blue-500 text-white hover:bg-blue-600">
-                          <Eye className="w-3 h-3 mr-1" />Detail
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-green-500 text-white hover:bg-green-600">
-                          <FileText className="w-3 h-3 mr-1" />Docs
-                        </Button>
+                        <div className="flex gap-2 pt-2">
+                          <Button size="sm" className="flex-1 bg-blue-500 text-white hover:bg-blue-600">
+                            <Eye className="w-3 h-3 mr-1" />Detail
+                          </Button>
+                          <Button size="sm" className="flex-1 bg-green-500 text-white hover:bg-green-600">
+                            <FileText className="w-3 h-3 mr-1" />Docs
+                          </Button>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm">Tidak ada kegiatan yang sesuai dengan pencarian "{searchQuery}"</p>
                   </div>
-                ))}
+                )}
 
                 {/* Mobile Pagination */}
                 {totalPages > 1 && isExpanded && (
@@ -645,7 +810,10 @@ const DashboardPages: React.FC = () => {
 
             {userRole === "Admin Pusat" && (
               <div className="max-w-full mt-3 md:mt-4">
-                <SelectSatdik selectTedOption={setSelectedSatdikId} />
+                <SelectSatdik
+                  idSatdik={IdSatdik}
+                  selectTedOption={setSelectedSatdikId}
+                />
               </div>
             )}
 
@@ -653,7 +821,9 @@ const DashboardPages: React.FC = () => {
             <div className="mt-3 md:mt-4 grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4">
               <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Pagu Total</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Pagu Total
+                  </div>
                   <div className="text-sm md:text-xl font-bold">
                     {formatCurrency(dataDashboard1?.total_anggaran || 0)}
                   </div>
@@ -662,7 +832,9 @@ const DashboardPages: React.FC = () => {
 
               <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Total Paket</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Total Paket
+                  </div>
                   <div className="text-sm md:text-xl font-bold">
                     {dataDashboard1?.total_kegiatan || 0}
                   </div>
@@ -671,16 +843,22 @@ const DashboardPages: React.FC = () => {
 
               <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Pengadaan Barang</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Pengadaan Barang
+                  </div>
                   <div className="text-sm md:text-xl font-bold">
-                    {formatCurrency(dataDashboard1?.total_pengadaan_barang || 0)}
+                    {formatCurrency(
+                      dataDashboard1?.total_pengadaan_barang || 0
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Renovasi Gedung dan Bangunan</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Renovasi Gedung dan Bangunan
+                  </div>
                   <div className="text-sm md:text-xl font-bold">
                     {formatCurrency(dataDashboard1?.total_perbaikan || 0)}
                   </div>
@@ -689,37 +867,49 @@ const DashboardPages: React.FC = () => {
 
               <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Pembangunan Gedung Baru</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Pembangunan Gedung Baru
+                  </div>
                   <div className="text-sm md:text-xl font-bold">
-                    {formatCurrency(dataDashboard1?.total_pembangunan_baru || 0)}
+                    {formatCurrency(
+                      dataDashboard1?.total_pembangunan_baru || 0
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-violet-500 to-violet-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Realisasi Keuangan</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Realisasi Keuangan
+                  </div>
                   <div className="text-sm md:text-xl font-bold">Rp 0</div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Progress Pengadaan Barang</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Progress Pengadaan Barang
+                  </div>
                   <div className="text-sm md:text-xl font-bold">0%</div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Progress Renovasi Gedung</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Progress Renovasi Gedung
+                  </div>
                   <div className="text-sm md:text-xl font-bold">0%</div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-pink-500 to-pink-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Progress Pembangunan Baru</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Progress Pembangunan Baru
+                  </div>
                   <div className="text-sm md:text-xl font-bold">0%</div>
                 </CardContent>
               </Card>
@@ -735,14 +925,18 @@ const DashboardPages: React.FC = () => {
 
               <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Status Selesai</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Status Selesai
+                  </div>
                   <div className="text-lg md:text-2xl font-bold">0</div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
                 <CardContent className="p-3 md:p-4">
-                  <div className="text-xs md:text-sm opacity-90">Status Proses</div>
+                  <div className="text-xs md:text-sm opacity-90">
+                    Status Proses
+                  </div>
                   <div className="text-lg md:text-2xl font-bold">0</div>
                 </CardContent>
               </Card>
@@ -752,9 +946,9 @@ const DashboardPages: React.FC = () => {
           {/* Project Cards */}
           {dataDashboard2 && dataDashboard2.length > 0 ? (
             dataDashboard2.map((project, index) => (
-              <ProjectCard 
-                key={project?.id || `project-${index}`} 
-                project={project} 
+              <ProjectCard
+                key={project?.id || `project-${index}`}
+                project={project}
                 projectIndex={index}
               />
             ))
@@ -763,17 +957,18 @@ const DashboardPages: React.FC = () => {
               <CardContent className="p-8 text-center">
                 <div className="text-gray-500">
                   <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold mb-2">Tidak ada data proyek</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Tidak ada data proyek
+                  </h3>
                   <p className="text-sm">
-                    {loading 
-                      ? "Sedang memuat data..." 
-                      : "Belum ada data proyek yang tersedia untuk ditampilkan."
-                    }
+                    {loading
+                      ? "Sedang memuat data..."
+                      : "Belum ada data proyek yang tersedia untuk ditampilkan."}
                   </p>
                   <div className="mt-4 text-xs text-gray-400">
                     <p>Debug Info:</p>
-                    <p>User Role: {userRole || 'Not set'}</p>
-                    <p>ID Satdik: {IdSatdik || 'Not set'}</p>
+                    <p>User Role: {userRole || "Not set"}</p>
+                    <p>ID Satdik: {IdSatdik || "Not set"}</p>
                     <p>Data Length: {dataDashboard2?.length || 0}</p>
                     <p>Loading: {loading.toString()}</p>
                   </div>

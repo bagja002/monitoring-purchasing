@@ -32,6 +32,11 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = React.useState<string | null>(null);
 
+  // Auto-close sidebar setelah klik menu item
+  const handleLinkClick = () => {
+    setSidebarOpen(false);
+  };
+
   const toggleMenu = (id: string) => {
     setOpenMenu(prev => (prev === id ? null : id)); // Accordion style
   };
@@ -77,6 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         {item.href ? (
           <Link
             href={item.href}
+            onClick={handleLinkClick}
             className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
               isDanger
                 ? "text-gray-700 hover:text-red-600 hover:bg-red-50"
@@ -121,13 +127,9 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </button>
         )}
 
-        {/* Sub-menu animasi */}
-        {hasChildren && (
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isOpen ? "max-h-40" : "max-h-0"
-            }`}
-          >
+        {/* Sub-menu tanpa animasi - langsung muncul/hilang */}
+        {hasChildren && isOpen && (
+          <div>
             {item.children!.map(child => renderMenuItem(child, level + 1))}
           </div>
         )}
@@ -138,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col overflow-y-auto bg-white border-r border-gray-200 duration-300 ease-linear lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col overflow-y-auto bg-white border-r border-gray-200 duration-300 ease-linear ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
