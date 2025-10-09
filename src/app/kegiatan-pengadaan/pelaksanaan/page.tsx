@@ -5,20 +5,11 @@ import KegiatanPengadaanPage from "@/component/page/kegiatan-pengadaan";
 import KegiatanPelaksananPage from "@/component/page/kegiatan-pengadaan/pengawasan";
 import { Metadata } from "next";
 
-
 export const metadata: Metadata = {
   title: "Pelaksaan",
   description: "Pelaksaan Page",
 };
 
-
-export default function Pelaksaan(){
-    return (
-        // <KegiatanPelaksananPage />
-        <>
-            <Mainlayout>
-               Halaman Dalam Tahap Pengembangan
-            </Mainlayout>
-        </>
-    )
+export default function Pelaksaan() {
+  return <KegiatanPelaksananPage />;
 }

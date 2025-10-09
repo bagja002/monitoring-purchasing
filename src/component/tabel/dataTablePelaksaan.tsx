@@ -85,7 +85,9 @@ const allColumns = (
         <Button
           size="sm"
           onClick={() =>
-            router.push(`pengawasan/edit/${row.original.id_perencanaan_kegiatan}`)
+            router.push(
+              `pengawasan/edit/${row.original.id_perencanaan_kegiatan}`
+            )
           }
         >
           Edit
@@ -317,7 +319,7 @@ export default function DataTablePelaksaan({ data }: Props) {
   };
 
   return (
-    <div className="space-y-4 max-w-[78vw] overflow-x-auto">
+    <div className="space-y-4 max-w-[97vw] overflow-x-auto">
       {/* Search */}
       <div className="flex justify-end mb-2">
         <Input
@@ -397,15 +399,18 @@ export default function DataTablePelaksaan({ data }: Props) {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
               Apakah Anda yakin ingin menghapus pekerjaan{" "}
               <strong className="font-medium">{namaPekerjaan}</strong> pada{" "}
-              <strong className="font-medium">{namaSatdik}</strong>? Tindakan ini
-              tidak dapat dibatalkan.
+              <strong className="font-medium">{namaSatdik}</strong>? Tindakan
+              ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
