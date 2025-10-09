@@ -100,7 +100,6 @@ interface Props {
   data: PerencanaanKegiatanReal[];
 }
 
-
 const allColumns = (
   router: ReturnType<typeof useRouter>,
   onDelete: (id: string | number) => void,
@@ -116,7 +115,7 @@ const allColumns = (
     header: "Action",
     cell: ({ row }) => (
       <div className="flex gap-2">
-         <button
+        <button
           className="bg-green-500 text-white px-2 py-1 rounded"
           onClick={() => {
             router.push(
@@ -139,9 +138,10 @@ const allColumns = (
         <button
           className="bg-red-500 text-white px-2 py-1 rounded"
           onClick={() => {
-              setNamaSatdik(row.original.satdik);
+            setNamaSatdik(row.original.satdik);
             setNamaPekerjaan(row.original.nama_pekerjaan);
-            onDelete(row.original.id_perencanaan_kegiatan)}}
+            onDelete(row.original.id_perencanaan_kegiatan);
+          }}
         >
           Delete
         </button>
@@ -526,18 +526,26 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
 
   const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [namaSatdik, setNamaSatdik] = React.useState<string | number | null>(null);
-  const [namaPekerjaan, setNamaPekerjaan] = React.useState<string | number | null>(null);
+  const [namaSatdik, setNamaSatdik] = React.useState<string | number | null>(
+    null
+  );
+  const [namaPekerjaan, setNamaPekerjaan] = React.useState<
+    string | number | null
+  >(null);
   const router = useRouter();
   const columns = React.useMemo(
     () =>
-      allColumns(router, (id: string | number) => {
-        setDeleteId(id);
-        setIsDeleteDialogOpen(true);
-      }, setNamaSatdik, setNamaPekerjaan),
+      allColumns(
+        router,
+        (id: string | number) => {
+          setDeleteId(id);
+          setIsDeleteDialogOpen(true);
+        },
+        setNamaSatdik,
+        setNamaPekerjaan
+      ),
     [router]
   );
-  
 
   const table = useReactTable({
     data,
@@ -611,7 +619,7 @@ export default function DataTablePembangunanRenovasi({ data }: Props) {
   };
 
   return (
-    <div className="space-y-4 max-w-[78vw] overflow-x-auto">
+    <div className="space-y-4 max-w-[97vw] overflow-x-auto">
       {/* Search */}
       <div className="flex justify-end mb-2">
         <Input

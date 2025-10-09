@@ -30,7 +30,7 @@ interface ResponseData {
   lama_pekerjaan: number;
   nilai_kontrak: number;
   sisa_pagu: number;
-  metode_pemilihan: string;
+  metode_pemilihan: string; 
   status_pekerjaan: string;
 }
 
@@ -57,6 +57,7 @@ interface DataPengawasan {
   hps: string;
   nilai_kontrak: string;
   sisa_pagu: string;
+  status_pekerjaan :string
 }
 
 interface LaporanMingguan {

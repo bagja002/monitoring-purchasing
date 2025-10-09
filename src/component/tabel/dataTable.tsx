@@ -46,7 +46,7 @@ const allColumns = (
   onDelete: (id: string | number) => void
 ): ColumnDef<PerencanaanKegiatanReal, any>[] => [
   {
-    id:"no",
+    id: "no",
     header: "No",
     cell: ({ row }) => row.index + 1, // row.index mulai dari 0
   },
@@ -59,7 +59,9 @@ const allColumns = (
         <button
           className="bg-green-500 text-white px-2 py-1 rounded"
           onClick={() =>
-            router.push(`/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan/${row.original.id_perencanaan_kegiatan}`)
+            router.push(
+              `/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan/${row.original.id_perencanaan_kegiatan}`
+            )
           }
         >
           View Pelaksanaan
@@ -67,7 +69,9 @@ const allColumns = (
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded"
           onClick={() =>
-            router.push(`perencanaan/edit/${row.original.id_perencanaan_kegiatan}`)
+            router.push(
+              `perencanaan/edit/${row.original.id_perencanaan_kegiatan}`
+            )
           }
         >
           Edit
@@ -97,10 +101,12 @@ const allColumns = (
     header: "Anggaran",
     cell: (info) => {
       const value = info.getValue<number>();
-      return value ? value.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      }) : "-";
+      return value
+        ? value.toLocaleString("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          })
+        : "-";
     },
   },
   {
@@ -127,13 +133,31 @@ const allColumns = (
       </>
     ),
   },
-  
-  
-  
-   { id: "kak", accessorFn: row => row.kak_p_barang, header: "KAK", cell: ({ getValue }) => fileCell(getValue()) },
-  { id: "rab", accessorFn: row => row.rab_p_barang, header: "RAB", cell: ({ getValue }) => fileCell(getValue()) },
-  { id: "hps_penetapan", accessorFn: row => row.hps_penetapan_p_barang, header: "HPS Penetapan", cell: ({ getValue }) => fileCell(getValue()) },
-  { id: "rancangan_kontrak", accessorFn: row => row.rancangan_kontrak_p_barang, header: "Rancangan Kontrak/SPK", cell: ({ getValue }) => fileCell(getValue()) },
+
+  {
+    id: "kak",
+    accessorFn: (row) => row.kak_p_barang,
+    header: "KAK",
+    cell: ({ getValue }) => fileCell(getValue()),
+  },
+  {
+    id: "rab",
+    accessorFn: (row) => row.rab_p_barang,
+    header: "RAB",
+    cell: ({ getValue }) => fileCell(getValue()),
+  },
+  {
+    id: "hps_penetapan",
+    accessorFn: (row) => row.hps_penetapan_p_barang,
+    header: "HPS Penetapan",
+    cell: ({ getValue }) => fileCell(getValue()),
+  },
+  {
+    id: "rancangan_kontrak",
+    accessorFn: (row) => row.rancangan_kontrak_p_barang,
+    header: "Rancangan Kontrak/SPK",
+    cell: ({ getValue }) => fileCell(getValue()),
+  },
   {
     id: "hps_nilai",
     accessorFn: (row) => row.hps_nilai_p_barang,
@@ -192,28 +216,28 @@ export default function DataTable({ data }: Props) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [deleteId, setDeleteId] = React.useState<string | number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-// Handle delete confirmation
-const handleDeleteClick = React.useCallback((id: string | number) => {
-  setDeleteId(id);
-  setIsDeleteDialogOpen(true);
-}, []);
+  // Handle delete confirmation
+  const handleDeleteClick = React.useCallback((id: string | number) => {
+    setDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  }, []);
 
- const handleDeleteConfirm = async () => {
-  if (deleteId !== null) {
-    try {
-      const res = await axios.delete(
-        `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
-      );
-  
-      window.location.reload()
-    } catch (err) {
-      console.error("Gagal hapus:", err);
-    } finally {
-      setIsDeleteDialogOpen(false);
-      setDeleteId(null);
+  const handleDeleteConfirm = async () => {
+    if (deleteId !== null) {
+      try {
+        const res = await axios.delete(
+          `http://103.177.176.202:6402/operator/DeletePerencanaan?id=${deleteId}`
+        );
+
+        window.location.reload();
+      } catch (err) {
+        console.error("Gagal hapus:", err);
+      } finally {
+        setIsDeleteDialogOpen(false);
+        setDeleteId(null);
+      }
     }
-  }
-};
+  };
 
   const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
@@ -229,7 +253,7 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
         [
           "no",
           "action",
-         
+
           "satdik",
           "nama_pekerjaan",
           "anggaran",
@@ -253,8 +277,8 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
   const table = useReactTable({
     data,
     columns,
-    state: { 
-      sorting, 
+    state: {
+      sorting,
       globalFilter,
     },
     onSortingChange: setSorting,
@@ -264,12 +288,17 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: (row, columnId, filterValue) => {
-      const searchableColumns = ['satdik', 'nama_pekerjaan', 'kategori_pengadaan', 'jadwal_pengadaan'];
-      
-      return searchableColumns.some(colId => {
+      const searchableColumns = [
+        "satdik",
+        "nama_pekerjaan",
+        "kategori_pengadaan",
+        "jadwal_pengadaan",
+      ];
+
+      return searchableColumns.some((colId) => {
         const col = table.getColumn(colId);
         if (!col) return false;
-        
+
         const cellValue = row.getValue(colId);
         return String(cellValue ?? "")
           .toLowerCase()
@@ -279,7 +308,7 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
   });
 
   return (
-    <div className="space-y-4 max-w-[78vw]">
+    <div className="space-y-4 max-w-[97vw] overflow-x-auto">
       {/* Search */}
       <div className="flex justify-end mb-2">
         <Input
@@ -347,7 +376,7 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
         <span className="flex items-center gap-1">
           <div>Page</div>
           <strong>
-            {table.getState().pagination.pageIndex + 1} of{' '}
+            {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </strong>
         </span>
@@ -361,19 +390,23 @@ const handleDeleteClick = React.useCallback((id: string | number) => {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+              Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak
+              dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleDeleteCancel}>
               Batal
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-red-600 hover:bg-red-700"
             >

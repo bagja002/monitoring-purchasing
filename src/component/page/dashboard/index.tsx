@@ -919,7 +919,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, projectIndex }) => {
 
           {userRole === "Admin Pusat" && (
             <>
-              <DashboardKontrak />
+              <DashboardKontrak  data={dataDashboard1}  />
               <DashboardPaketPekerjaan />
             </>
           )}

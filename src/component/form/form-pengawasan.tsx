@@ -50,16 +50,14 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">Kategori Pengadaan</Label>
           <Input readOnly {...register("kategori_pengadaan")} />
         </div>
-             <div>
+        <div>
           <Label className="mb-2">Metode Pemilihan</Label>
-             <Input
+          <Input
             readOnly={!isEdit}
             {...register("metode_pemilihan")}
             className={!isEdit ? "bg-gray-50" : ""}
           />
         </div>
-        
-        
 
         <div>
           <Label className="mb-2">Lokasi Kerja</Label>
@@ -106,7 +104,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
         </div>
       </div>
       <div className="grid grid-cols-2 space-x-5">
-         <div>
+        <div>
           <Label className="mb-2">No Tanggal Kontrak SPK</Label>
           <Input
             readOnly={!isEdit}
@@ -114,7 +112,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
             className={!isEdit ? "bg-gray-50" : ""}
           />
         </div>
-         <div>
+        <div>
           <Label className="mb-2">Tanggal Kontrak Berakhir</Label>
           <Input
             readOnly={!isEdit}
@@ -130,7 +128,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">Anggaran</Label>
           <Controller
             name="anggaran"
-            control={control}  // ✅ wajib
+            control={control} // ✅ wajib
             render={({ field }) => (
               <Input
                 {...field}
@@ -153,7 +151,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">HPS</Label>
           <Controller
             name="hps"
-            control={control}  // ✅ wajib
+            control={control} // ✅ wajib
             render={({ field }) => (
               <Input
                 {...field}
@@ -176,7 +174,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">Nilai Kontrak</Label>
           <Controller
             name="nilai_kontrak"
-            control={control}  // ✅ wajib
+            control={control} // ✅ wajib
             render={({ field }) => (
               <Input
                 {...field}
@@ -201,7 +199,7 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
           <Label className="mb-2">Sisa Pagu</Label>
           <Controller
             name="sisa_pagu"
-            control={control}  // ✅ wajib
+            control={control} // ✅ wajib
             render={({ field }) => {
               const anggaran = Number(watch("anggaran") || 0);
               const nilaiKontrak = Number(watch("nilai_kontrak") || 0);
@@ -216,6 +214,22 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
               );
             }}
           />
+        </div>
+
+        <div>
+          <Label className="mb-2">Status Pekerjaan</Label>
+          <select
+            disabled={!isEdit}
+            {...register("status_pekerjaan")}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">Pilih Status Pekerjaan</option>
+            <option value="Belum Tender">Belum Tender</option>
+            <option value="Proses Tender">Proses Tender</option>
+            <option value="Selesai Tender">Selesai Tender</option>
+            <option value="Pelaksanaan Kontrak">Pelaksanaan Kontrak</option>
+            <option value="Selesai (BAST)">Selesai (BAST)</option>
+          </select>
         </div>
       </div>
 
