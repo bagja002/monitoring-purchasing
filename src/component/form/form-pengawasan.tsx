@@ -3,7 +3,9 @@ import { Label } from "@/components/ui/label";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
-
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 
 export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
   const { register, handleSubmit, watch, control } = useForm({
@@ -70,11 +72,19 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
 
         <div>
           <Label className="mb-2">Link CCTV</Label>
-          <Input
-            readOnly={!isEdit}
-            {...register("link_cctv")}
-            className={!isEdit ? "bg-gray-50" : ""}
-          />
+          <Link
+            href={`/kegiatan-pengadaan/pelaksanaan/cctv/${data.id_pelaksanaan_pengadaan}`}
+            className="block"
+          >
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left font-normal"
+              type="button"
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              View CCTV
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="grid grid-cols-2 space-x-5">

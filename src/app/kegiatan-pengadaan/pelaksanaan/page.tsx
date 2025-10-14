@@ -11,5 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function Pelaksaan() {
-  return <KegiatanPelaksananPage />;
+  // return <KegiatanPelaksananPage />;
+
+  return <Mainlayout>Halaman Dalam Pengembangan</Mainlayout>;
 }

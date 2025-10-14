@@ -2,44 +2,43 @@
 
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface LiveStreamProps {
   playlistUrl: string;
-  autoPlay?: boolean;
 }
 
-export default function LiveStream({
-  playlistUrl,
-  autoPlay = true,
-}: LiveStreamProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+export default function LiveStream({ playlistUrl }: LiveStreamProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    if (!videoRef.current) return;
 
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = playlistUrl;
-      if (autoPlay) video.play().catch(() => null);
-    } else if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(playlistUrl);
-      hls.attachMedia(video);
-      if (autoPlay) {
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(() => null);
-        });
-      }
-      return () => hls.destroy();
-    }
-  }, [playlistUrl, autoPlay]);
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(playlistUrl)}`;
+    const hls = new Hls();
+
+    hls.loadSource(proxyUrl);
+    hls.attachMedia(videoRef.current);
+
+    // Hapus autoplay, biarkan user yang klik play
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      // Video siap, tapi tidak auto play
+      console.log("Stream ready");
+    });
+
+    return () => hls.destroy();
+  }, [playlistUrl]);
 
   return (
-    <video
-      ref={videoRef}
-      controls
-      muted
-      className="w-full h-full object-cover rounded-xl bg-black"
-    />
+    <Card className="max-w-3xl mx-auto mt-10 shadow-lg border border-gray-200 rounded-2xl">
+      <CardContent className="p-4">
+        <video
+          ref={videoRef}
+          controls
+          className="w-full h-auto rounded-xl bg-black"
+          preload="metadata"
+        />
+      </CardContent>
+    </Card>
   );
 }
