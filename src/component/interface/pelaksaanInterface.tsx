@@ -16,3 +16,5 @@ export interface PelaksaanKegiatan {
   nilai_kontrak: number;
   sisa_pagu: number;
 }
+
+//
