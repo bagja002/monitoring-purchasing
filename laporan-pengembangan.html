@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pengembangan Aplikasi E-Purchasing</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #1e40af;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #334155;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .tech-item {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .tech-label {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .module-section {
+            background: #f8fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LAPORAN PENGEMBANGAN APLIKASI</h1>
+        <h1>SISTEM E-PURCHASING</h1>
+        <p>Versi 0.1.0</p>
+        <p>Tanggal: Oktober 2025</p>
+    </div>
+
+    <h2>1. RINGKASAN EKSEKUTIF</h2>
+    <div class="info-box">
+        <p>
+            Aplikasi E-Purchasing adalah sistem informasi berbasis web yang dikembangkan untuk mengelola
+            proses pengadaan barang dan jasa secara elektronik. Aplikasi ini dirancang untuk meningkatkan
+            efisiensi, transparansi, dan akuntabilitas dalam proses pengadaan dari tahap perencanaan hingga
+            pelaksanaan dan pengawasan.
+        </p>
+    </div>
+
+    <h2>2. INFORMASI PROYEK</h2>
+    <table>
+        <tr>
+            <th>Aspek</th>
+            <th>Deskripsi</th>
+        </tr>
+        <tr>
+            <td>Nama Aplikasi</td>
+            <td>E-Purchasing System (Proc750)</td>
+        </tr>
+        <tr>
+            <td>Versi</td>
+            <td>0.1.0</td>
+        </tr>
+        <tr>
+            <td>Tipe Aplikasi</td>
+            <td>Web Application (Progressive Web App)</td>
+        </tr>
+        <tr>
+            <td>Framework Utama</td>
+            <td>Next.js 15.5.3 (React 19.1.0)</td>
+        </tr>
+        <tr>
+            <td>Bahasa Pemrograman</td>
+            <td>TypeScript 5.x</td>
+        </tr>
+        <tr>
+            <td>Arsitektur</td>
+            <td>Client-Server dengan REST API</td>
+        </tr>
+    </table>
+
+    <h2>3. TEKNOLOGI YANG DIGUNAKAN</h2>
+
+    <h3>3.1 Frontend Technologies</h3>
+    <table>
+        <tr>
+            <th>Teknologi</th>
+            <th>Versi</th>
+            <th>Fungsi</th>
+        </tr>
+        <tr>
+            <td>Next.js</td>
+            <td>15.5.3</td>
+            <td>Framework React untuk Server-Side Rendering dan Routing</td>
+        </tr>
+        <tr>
+            <td>React</td>
+            <td>19.1.0</td>
+            <td>Library untuk membangun user interface</td>
+        </tr>
+        <tr>
+            <td>TypeScript</td>
+            <td>5.x</td>
+            <td>Superset JavaScript dengan type safety</td>
+        </tr>
+        <tr>
+            <td>Tailwind CSS</td>
+            <td>4.x</td>
+            <td>Utility-first CSS framework untuk styling</td>
+        </tr>
+        <tr>
+            <td>Radix UI</td>
+            <td>Latest</td>
+            <td>Komponen UI accessible dan customizable</td>
+        </tr>
+        <tr>
+            <td>Lucide React</td>
+            <td>0.544.0</td>
+            <td>Icon library</td>
+        </tr>
+    </table>
+
+    <h3>3.2 State Management & Data Handling</h3>
+    <table>
+        <tr>
+            <th>Teknologi</th>
+            <th>Versi</th>
+            <th>Fungsi</th>
+        </tr>
+        <tr>
+            <td>TanStack Table</td>
+            <td>8.21.3</td>
+            <td>Headless table library untuk data tables</td>
+        </tr>
+        <tr>
+            <td>React Hook Form</td>
+            <td>7.62.0</td>
+            <td>Form validation dan state management</td>
+        </tr>
+        <tr>
+            <td>Axios</td>
+            <td>1.12.2</td>
+            <td>HTTP client untuk API requests</td>
+        </tr>
+        <tr>
+            <td>JWT Decode</td>
+            <td>4.0.0</td>
+            <td>Dekode JSON Web Tokens untuk autentikasi</td>
+        </tr>
+        <tr>
+            <td>Cookies Next</td>
+            <td>6.1.0</td>
+            <td>Cookie management untuk session handling</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h3>3.3 Data Visualization & Media</h3>
+    <table>
+        <tr>
+            <th>Teknologi</th>
+            <th>Versi</th>
+            <th>Fungsi</th>
+        </tr>
+        <tr>
+            <td>Chart.js</td>
+            <td>4.5.0</td>
+            <td>Library untuk visualisasi data dalam bentuk grafik</td>
+        </tr>
+        <tr>
+            <td>React Chartjs 2</td>
+            <td>5.3.0</td>
+            <td>React wrapper untuk Chart.js</td>
+        </tr>
+        <tr>
+            <td>HLS.js</td>
+            <td>1.6.13</td>
+            <td>HTTP Live Streaming untuk CCTV monitoring</td>
+        </tr>
+    </table>
+
+    <h3>3.4 Export & Document Generation</h3>
+    <table>
+        <tr>
+            <th>Teknologi</th>
+            <th>Versi</th>
+            <th>Fungsi</th>
+        </tr>
+        <tr>
+            <td>ExcelJS</td>
+            <td>4.4.0</td>
+            <td>Generate dan manipulasi file Excel</td>
+        </tr>
+        <tr>
+            <td>File Saver</td>
+            <td>2.0.5</td>
+            <td>Save files di client-side</td>
+        </tr>
+    </table>
+
+    <h2>4. FITUR DAN MODUL APLIKASI</h2>
+
+    <div class="module-section">
+        <h3>4.1 Modul Autentikasi</h3>
+        <ul class="feature-list">
+            <li>Login untuk Admin</li>
+            <li>Login untuk Operator</li>
+            <li>Session management dengan JWT</li>
+            <li>Cookie-based authentication</li>
+            <li>Role-based access control</li>
+        </ul>
+    </div>
+
+    <div class="module-section">
+        <h3>4.2 Modul Dashboard</h3>
+        <ul class="feature-list">
+            <li>Dashboard overview dengan statistik real-time</li>
+            <li>Visualisasi data dengan grafik (Chart.js)</li>
+            <li>Detail dashboard per item</li>
+            <li>Tabel data perencanaan</li>
+            <li>Monitoring sebaran pengadaan</li>
+        </ul>
+    </div>
+
+    <div class="module-section">
+        <h3>4.3 Modul Kegiatan Pengadaan - Perencanaan</h3>
+        <ul class="feature-list">
+            <li>Daftar perencanaan pengadaan</li>
+            <li>Tambah perencanaan baru</li>
+            <li>Edit perencanaan existing</li>
+            <li>Data table dengan sorting dan filtering</li>
+            <li>Form input perencanaan dengan validasi</li>
+            <li>Identifikasi pagu anggaran</li>
+        </ul>
+    </div>
+
+    <div class="module-section">
+        <h3>4.4 Modul Kegiatan Pengadaan - Pelaksanaan</h3>
+        <ul class="feature-list">
+            <li>Daftar pelaksanaan pengadaan</li>
+            <li>Tambah pelaksanaan baru</li>
+            <li>Detail pelaksanaan (barang/jasa)</li>
+            <li>Detail pelaksanaan pembangunan</li>
+            <li>Data table renovasi dan pembangunan</li>
+            <li>Laporan mingguan pelaksanaan</li>
+        </ul>
+    </div>
+
+    <div class="module-section">
+        <h3>4.5 Modul Pengawasan</h3>
+        <ul class="feature-list">
+            <li>Form pengawasan proyek</li>
+            <li>CCTV monitoring real-time dengan HLS streaming</li>
+            <li>Live stream monitoring pelaksanaan</li>
+            <li>Data real-time pengawasan</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="module-section">
+        <h3>4.6 Fitur Umum</h3>
+        <ul class="feature-list">
+            <li>Dark mode support (next-themes)</li>
+            <li>Responsive design untuk mobile dan desktop</li>
+            <li>Export data ke Excel</li>
+            <li>Dropdown selection Satuan Kerja (Satdik)</li>
+            <li>Alert dan notifikasi (Sonner)</li>
+            <li>Dialog dan modal components</li>
+            <li>Accordion untuk navigasi</li>
+            <li>Badge dan status indicators</li>
+        </ul>
+    </div>
+
+    <h2>5. ARSITEKTUR SISTEM</h2>
+
+    <h3>5.1 Struktur Folder</h3>
+    <div class="info-box">
+        <pre style="margin: 0; overflow-x: auto;">
+src/
+├── app/                          # Next.js App Router
+│   ├── auth/                     # Halaman autentikasi
+│   │   ├── admin/login/          # Login admin
+│   │   └── operator/login/       # Login operator
+│   ├── dashboard/                # Dashboard pages
+│   │   └── detail-dashboard/     # Detail dashboard
+│   ├── kegiatan-pengadaan/       # Modul pengadaan
+│   │   ├── perencanaan/          # Perencanaan
+│   │   │   ├── tambah/           # Tambah perencanaan
+│   │   │   └── edit/[id]/        # Edit perencanaan
+│   │   └── pelaksanaan/          # Pelaksanaan
+│   │       ├── tambah/           # Tambah pelaksanaan
+│   │       ├── detail-pelaksanaan/
+│   │       ├── detail-pelaksanaan-pembangunan/
+│   │       └── cctv/[id]/        # CCTV monitoring
+│   └── api/                      # API routes
+│       └── proxy/                # API proxy
+├── component/                    # Reusable components
+│   ├── card/                     # Card components
+│   ├── chart/                    # Chart components
+│   ├── dropdown/                 # Dropdown components
+│   ├── form/                     # Form components
+│   ├── header/                   # Header component
+│   ├── interface/                # TypeScript interfaces
+│   ├── layout/                   # Layout components
+│   ├── live-stream/              # Live streaming
+│   ├── page/                     # Page components
+│   ├── sidebar/                  # Sidebar navigation
+│   ├── tabel/                    # Table components
+│   └── utils/                    # Utility functions
+└── components/ui/                # Shadcn UI components
+    ├── accordion.tsx
+    ├── alert-dialog.tsx
+    ├── badge.tsx
+    ├── button.tsx
+    ├── card.tsx
+    ├── dialog.tsx
+    ├── drawer.tsx
+    ├── input.tsx
+    ├── label.tsx
+    ├── select.tsx
+    ├── table.tsx
+    └── textarea.tsx
+        </pre>
+    </div>
+
+    <h3>5.2 Arsitektur Aplikasi</h3>
+    <div class="info-box">
+        <p><strong>Client-Side:</strong></p>
+        <ul>
+            <li>Next.js 15 dengan App Router untuk routing dan SSR</li>
+            <li>React 19 untuk UI components</li>
+            <li>TypeScript untuk type safety</li>
+            <li>Tailwind CSS untuk styling</li>
+        </ul>
+
+        <p><strong>Server-Side:</strong></p>
+        <ul>
+            <li>Next.js API Routes sebagai middleware/proxy</li>
+            <li>Axios untuk komunikasi dengan backend API</li>
+            <li>JWT untuk autentikasi dan otorisasi</li>
+        </ul>
+
+        <p><strong>State Management:</strong></p>
+        <ul>
+            <li>React hooks (useState, useEffect)</li>
+            <li>Cookies untuk session management</li>
+            <li>React Hook Form untuk form state</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>6. KOMPONEN UI YANG DIGUNAKAN</h2>
+    <table>
+        <tr>
+            <th>Komponen</th>
+            <th>Library</th>
+            <th>Penggunaan</th>
+        </tr>
+        <tr>
+            <td>Accordion</td>
+            <td>Radix UI</td>
+            <td>Collapsible sections pada sidebar dan forms</td>
+        </tr>
+        <tr>
+            <td>Alert Dialog</td>
+            <td>Radix UI</td>
+            <td>Konfirmasi aksi penting (delete, submit)</td>
+        </tr>
+        <tr>
+            <td>Dialog/Modal</td>
+            <td>Radix UI</td>
+            <td>Pop-up forms dan detail views</td>
+        </tr>
+        <tr>
+            <td>Drawer</td>
+            <td>Vaul</td>
+            <td>Mobile-friendly slide-in panels</td>
+        </tr>
+        <tr>
+            <td>Select</td>
+            <td>Radix UI</td>
+            <td>Dropdown selections (Satdik, status, dll)</td>
+        </tr>
+        <tr>
+            <td>Table</td>
+            <td>TanStack Table</td>
+            <td>Data tables dengan sorting dan pagination</td>
+        </tr>
+        <tr>
+            <td>Toast/Notification</td>
+            <td>Sonner</td>
+            <td>Success/error messages</td>
+        </tr>
+        <tr>
+            <td>Badge</td>
+            <td>Custom</td>
+            <td>Status indicators</td>
+        </tr>
+        <tr>
+            <td>Card</td>
+            <td>Custom</td>
+            <td>Content containers</td>
+        </tr>
+        <tr>
+            <td>Button</td>
+            <td>Custom with CVA</td>
+            <td>Interactive actions</td>
+        </tr>
+    </table>
+
+    <h2>7. ALUR KERJA APLIKASI</h2>
+
+    <h3>7.1 Alur Autentikasi</h3>
+    <ol>
+        <li>User membuka halaman login (admin atau operator)</li>
+        <li>User memasukkan credentials</li>
+        <li>Sistem memvalidasi credentials melalui API</li>
+        <li>Backend mengembalikan JWT token jika valid</li>
+        <li>Token disimpan dalam cookies</li>
+        <li>User diarahkan ke dashboard</li>
+        <li>Setiap request dilengkapi dengan JWT token untuk otorisasi</li>
+    </ol>
+
+    <h3>7.2 Alur Perencanaan Pengadaan</h3>
+    <ol>
+        <li>User mengakses menu Kegiatan Pengadaan > Perencanaan</li>
+        <li>Sistem menampilkan tabel data perencanaan</li>
+        <li>User dapat menambah perencanaan baru melalui form</li>
+        <li>Form validasi menggunakan React Hook Form</li>
+        <li>Data dikirim ke backend API melalui Axios</li>
+        <li>Sistem memberikan feedback sukses/error</li>
+        <li>Tabel data direfresh otomatis</li>
+        <li>User dapat edit/view detail perencanaan existing</li>
+    </ol>
+
+    <h3>7.3 Alur Pelaksanaan Pengadaan</h3>
+    <ol>
+        <li>User mengakses menu Kegiatan Pengadaan > Pelaksanaan</li>
+        <li>Sistem menampilkan data pelaksanaan ongoing</li>
+        <li>User dapat melihat detail pelaksanaan</li>
+        <li>User dapat memantau progress melalui laporan mingguan</li>
+        <li>User dapat mengakses CCTV monitoring real-time</li>
+        <li>Data real-time ditampilkan dengan visualisasi grafik</li>
+    </ol>
+
+    <h3>7.4 Alur Monitoring CCTV</h3>
+    <ol>
+        <li>User mengakses detail pelaksanaan</li>
+        <li>Klik menu CCTV monitoring</li>
+        <li>Sistem load HLS stream dari server</li>
+        <li>Live video ditampilkan dengan HLS.js player</li>
+        <li>User dapat monitoring real-time pelaksanaan proyek</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <h2>8. FITUR KEAMANAN</h2>
+    <ul class="feature-list">
+        <li>JWT-based authentication untuk secure session management</li>
+        <li>Cookie-based token storage dengan HttpOnly flag</li>
+        <li>Role-based access control (Admin vs Operator)</li>
+        <li>Form validation pada client dan server side</li>
+        <li>TypeScript untuk type safety dan mencegah runtime errors</li>
+        <li>Proxy API route untuk menyembunyikan backend endpoint</li>
+        <li>HTTPS ready untuk production deployment</li>
+    </ul>
+
+    <h2>9. PERFORMA DAN OPTIMASI</h2>
+    <ul class="feature-list">
+        <li><strong>Turbopack:</strong> Build tool Next.js untuk faster development dan build times</li>
+        <li><strong>Server-Side Rendering (SSR):</strong> Faster initial page load</li>
+        <li><strong>Code Splitting:</strong> Automatic code splitting dengan Next.js App Router</li>
+        <li><strong>Image Optimization:</strong> Built-in Next.js image optimization</li>
+        <li><strong>Font Optimization:</strong> next/font untuk optimized font loading</li>
+        <li><strong>Lazy Loading:</strong> Components loaded on demand</li>
+        <li><strong>Responsive Design:</strong> Mobile-first approach dengan Tailwind CSS</li>
+    </ul>
+
+    <h2>10. DEPLOYMENT DAN BUILD</h2>
+
+    <h3>10.1 Scripts Available</h3>
+    <table>
+        <tr>
+            <th>Command</th>
+            <th>Fungsi</th>
+        </tr>
+        <tr>
+            <td><code>npm run dev</code></td>
+            <td>Menjalankan development server dengan Turbopack</td>
+        </tr>
+        <tr>
+            <td><code>npm run build</code></td>
+            <td>Build production-ready application</td>
+        </tr>
+        <tr>
+            <td><code>npm start</code></td>
+            <td>Menjalankan production server</td>
+        </tr>
+        <tr>
+            <td><code>npm run lint</code></td>
+            <td>Menjalankan ESLint untuk code quality check</td>
+        </tr>
+    </table>
+
+    <h3>10.2 Requirements</h3>
+    <table>
+        <tr>
+            <th>Software</th>
+            <th>Minimum Version</th>
+        </tr>
+        <tr>
+            <td>Node.js</td>
+            <td>20.x atau lebih tinggi</td>
+        </tr>
+        <tr>
+            <td>npm/yarn/pnpm</td>
+            <td>Latest stable version</td>
+        </tr>
+        <tr>
+            <td>Browser</td>
+            <td>Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>11. ROADMAP PENGEMBANGAN</h2>
+
+    <h3>11.1 Fase 1 (Current - v0.1.0)</h3>
+    <ul class="feature-list">
+        <li>Modul autentikasi Admin dan Operator</li>
+        <li>Dashboard dengan visualisasi data</li>
+        <li>Modul Perencanaan Pengadaan (CRUD)</li>
+        <li>Modul Pelaksanaan Pengadaan</li>
+        <li>CCTV Monitoring</li>
+        <li>Export data ke Excel</li>
+    </ul>
+
+    <h3>11.2 Fase 2 (Planned - v0.2.0)</h3>
+    <ul class="feature-list">
+        <li>Modul pelaporan dan analytics advanced</li>
+        <li>Notifikasi real-time untuk stakeholders</li>
+        <li>Integration dengan sistem e-budgeting</li>
+        <li>Mobile app companion</li>
+        <li>Advanced search dan filtering</li>
+        <li>Document management system</li>
+    </ul>
+
+    <h3>11.3 Fase 3 (Future - v1.0.0)</h3>
+    <ul class="feature-list">
+        <li>AI-powered recommendation untuk pengadaan</li>
+        <li>Blockchain integration untuk transparency</li>
+        <li>Multi-language support</li>
+        <li>Advanced analytics dashboard dengan predictive analysis</li>
+        <li>Integration dengan sistem pihak ketiga (e-katalog, LPSE)</li>
+        <li>Audit trail yang comprehensive</li>
+    </ul>
+
+    <h2>12. TANTANGAN DAN SOLUSI</h2>
+
+    <table>
+        <tr>
+            <th>Tantangan</th>
+            <th>Solusi</th>
+        </tr>
+        <tr>
+            <td>Real-time CCTV streaming</td>
+            <td>Implementasi HLS.js untuk adaptive streaming dan low latency</td>
+        </tr>
+        <tr>
+            <td>Large data tables performance</td>
+            <td>Menggunakan TanStack Table dengan virtual scrolling dan pagination</td>
+        </tr>
+        <tr>
+            <td>Complex form validation</td>
+            <td>React Hook Form dengan custom validation rules</td>
+        </tr>
+        <tr>
+            <td>State management complexity</td>
+            <td>Kombinasi React hooks dan context API untuk efficient state handling</td>
+        </tr>
+        <tr>
+            <td>Mobile responsiveness</td>
+            <td>Mobile-first design dengan Tailwind CSS breakpoints</td>
+        </tr>
+        <tr>
+            <td>Build time optimization</td>
+            <td>Turbopack untuk faster builds dan hot reload</td>
+        </tr>
+    </table>
+
+    <h2>13. KESIMPULAN</h2>
+    <div class="info-box">
+        <p>
+            Aplikasi E-Purchasing telah berhasil dikembangkan menggunakan teknologi modern dan best practices
+            dalam web development. Dengan framework Next.js 15 dan React 19, aplikasi ini menawarkan performa
+            tinggi, user experience yang baik, dan maintainability yang optimal.
+        </p>
+        <p>
+            Sistem ini mencakup seluruh siklus pengadaan dari perencanaan, pelaksanaan, hingga pengawasan dengan
+            fitur-fitur pendukung seperti real-time monitoring, data visualization, dan export capabilities.
+            Arsitektur yang modular memungkinkan pengembangan dan penambahan fitur secara berkelanjutan.
+        </p>
+        <p>
+            Dengan teknologi yang digunakan dan roadmap yang terstruktur, aplikasi E-Purchasing siap untuk
+            dikembangkan lebih lanjut sesuai dengan kebutuhan organisasi yang terus berkembang.
+        </p>
+    </div>
+
+    <h2>14. REKOMENDASI</h2>
+    <ul class="feature-list">
+        <li>Implementasi unit testing dan integration testing untuk quality assurance</li>
+        <li>Setup CI/CD pipeline untuk automated deployment</li>
+        <li>Implementasi monitoring dan logging system (Sentry, LogRocket)</li>
+        <li>Performance monitoring dengan Lighthouse CI</li>
+        <li>Regular security audit dan penetration testing</li>
+        <li>Dokumentasi API yang comprehensive dengan Swagger/OpenAPI</li>
+        <li>User training dan dokumentasi penggunaan aplikasi</li>
+    </ul>
+
+    <div class="footer">
+        <p><strong>Laporan Pengembangan Aplikasi E-Purchasing</strong></p>
+        <p>© 2024 E-Purchasing System (Proc750) - Version 0.1.0</p>
+        <p>Dokumen ini dibuat secara otomatis berdasarkan analisis kode sumber aplikasi</p>
+    </div>
+</body>
+</html>

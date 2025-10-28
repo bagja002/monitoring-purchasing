@@ -389,7 +389,6 @@ export default function EditKegiatanForm() {
   }, [id, reset]);
 
   useEffect(() => {
-    
     fetchData();
   }, [fetchData]);
 
@@ -419,6 +418,7 @@ export default function EditKegiatanForm() {
         }
       });
 
+      console.log("Update response:", formData);
       const response = await axios.put(
         `${baseUrl}/operator/updateRencanaPengadaan?id=${id}`,
         formData,
@@ -1010,7 +1010,10 @@ export default function EditKegiatanForm() {
               </div>
             </>
           )}
-          {["Perbaikan Gedung dan Bangunan", "Pembangunan Gedung Baru"].includes(kategori)  && (
+          {[
+            "Perbaikan Gedung dan Bangunan",
+            "Pembangunan Gedung Baru",
+          ].includes(kategori) && (
             <>
               <Accordion type="single" collapsible className="w-full">
                 {/* Konsultan Perencana */}

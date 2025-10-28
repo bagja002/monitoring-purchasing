@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rincian Pekerjaan Fitur E-Purchasing</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #1e40af;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            color: #334155;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            color: #475569;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .feature-module {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            page-break-inside: avoid;
+        }
+
+        .feature-module h3 {
+            color: #1e40af;
+            margin-top: 0;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 10px;
+        }
+
+        .feature-detail {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            page-break-inside: avoid;
+        }
+
+        .feature-detail h4 {
+            color: #2563eb;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-detail h4::before {
+            content: "⚡";
+            margin-right: 8px;
+        }
+
+        .tech-used {
+            background: #eff6ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .tech-used strong {
+            color: #1e40af;
+        }
+
+        ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        ul li {
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+
+        .implementation-detail {
+            background: #fef3c7;
+            border-left: 3px solid #f59e0b;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .code-location {
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 8px 0;
+            color: #475569;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .complexity-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .complexity-medium {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .complexity-high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+            page-break-inside: auto;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+        }
+
+        .workflow-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+        }
+
+        .workflow-step::before {
+            content: "→";
+            color: #3b82f6;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RINCIAN PEKERJAAN FITUR-FITUR</h1>
+        <h1>APLIKASI E-PURCHASING</h1>
+        <p>Dokumentasi Detail Implementasi</p>
+        <p>Versi 0.1.0 - Oktober 2025</p>
+    </div>
+
+    <h2>DAFTAR ISI</h2>
+    <ol>
+        <li>Modul Autentikasi & Otorisasi</li>
+        <li>Modul Dashboard & Visualisasi Data</li>
+        <li>Modul Perencanaan Pengadaan</li>
+        <li>Modul Pelaksanaan Pengadaan</li>
+        <li>Modul Pengawasan & Monitoring</li>
+        <li>Fitur CCTV Live Streaming</li>
+        <li>Fitur Export Data</li>
+        <li>Komponen UI & User Experience</li>
+        <li>Ringkasan Kompleksitas Pekerjaan</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <h2>1. MODUL AUTENTIKASI & OTORISASI</h2>
+
+    <div class="feature-module">
+        <h3>1.1 Login Multi-Role</h3>
+
+        <div class="feature-detail">
+            <h4>Login Admin</h4>
+            <div class="code-location">📁 src/app/auth/admin/login/page.tsx</div>
+            <div class="code-location">📁 src/component/page/auth/admin/login/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat halaman login khusus untuk Admin Pusat</li>
+                <li>Implementasi form login dengan validasi input (email/username dan password)</li>
+                <li>Integrasi dengan backend API untuk autentikasi</li>
+                <li>Menangani response sukses dan error dari server</li>
+                <li>Redirect ke dashboard setelah login berhasil</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Next.js App Router, React Hook Form, Axios, JWT Decode, Cookies Next
+            </div>
+
+            <div class="implementation-detail">
+                <strong>Detail Implementasi:</strong>
+                <ul>
+                    <li>Validasi client-side menggunakan React Hook Form</li>
+                    <li>POST request ke endpoint autentikasi backend</li>
+                    <li>Menerima JWT token dari backend</li>
+                    <li>Menyimpan token dalam cookies dengan HttpOnly flag</li>
+                    <li>Decode token untuk mendapatkan user info (role, id, name)</li>
+                    <li>Set session state dan redirect ke dashboard</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 8-12 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Login Operator</h4>
+            <div class="code-location">📁 src/app/auth/operator/login/page.tsx</div>
+            <div class="code-location">📁 src/component/page/auth/operator/login/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat halaman login untuk Operator Satdik</li>
+                <li>Form login dengan field username/email dan password</li>
+                <li>Validasi input dan error handling</li>
+                <li>Integrasi API autentikasi operator</li>
+                <li>Session management dengan cookies</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Next.js, React Hook Form, Axios, JWT, Cookies
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 8-12 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>JWT Token Management</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi JWT decode untuk extract user information</li>
+                <li>Cookie-based token storage dengan security flags</li>
+                <li>Auto-refresh mechanism untuk expired tokens (optional)</li>
+                <li>Token validation di setiap protected route</li>
+                <li>Logout functionality dengan token cleanup</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> jwt-decode (4.0.0), cookies-next (6.1.0)
+            </div>
+
+            <div class="workflow-box">
+                <strong>Workflow Autentikasi:</strong>
+                <div class="workflow-step">User input credentials di form login</div>
+                <div class="workflow-step">Submit form → POST ke API backend</div>
+                <div class="workflow-step">Backend validasi credentials</div>
+                <div class="workflow-step">Backend return JWT token jika valid</div>
+                <div class="workflow-step">Frontend decode token untuk extract payload</div>
+                <div class="workflow-step">Simpan token di cookies (XSX01)</div>
+                <div class="workflow-step">Set user state (role, id, name)</div>
+                <div class="workflow-step">Redirect ke dashboard sesuai role</div>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 16-20 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Role-Based Access Control (RBAC)</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi 3 role: Admin Pusat, Admin Satdik, Operator Satdik</li>
+                <li>Permission management berdasarkan role</li>
+                <li>Conditional rendering UI elements per role</li>
+                <li>Route protection untuk halaman tertentu</li>
+                <li>Admin Pusat: akses penuh + dropdown filter Satdik</li>
+                <li>Admin Satdik: akses view semua Satdik</li>
+                <li>Operator Satdik: akses terbatas ke Satdik sendiri + CRUD</li>
+            </ul>
+
+            <div class="implementation-detail">
+                <strong>Implementasi RBAC:</strong>
+                <ul>
+                    <li>Decode JWT token untuk mendapatkan user role dan id_unit_kerja</li>
+                    <li>Set conditional rendering dengan {userRole === "Admin Pusat" && ...}</li>
+                    <li>Filter data berdasarkan id_satdik untuk Operator</li>
+                    <li>Show/hide tombol "Tambah" untuk Operator dan Admin Satdik only</li>
+                    <li>Show/hide dropdown Satdik untuk Admin Pusat only</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 12-16 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>2. MODUL DASHBOARD & VISUALISASI DATA</h2>
+
+    <div class="feature-module">
+        <h3>2.1 Dashboard Utama</h3>
+
+        <div class="feature-detail">
+            <h4>Dashboard Overview dengan Statistik Real-time</h4>
+            <div class="code-location">📁 src/app/dashboard/page.tsx</div>
+            <div class="code-location">📁 src/component/page/dashboard/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat dashboard dengan 12 card statistik (Pagu Total, Total Paket, Pengadaan Barang, dll)</li>
+                <li>Fetch data dari 2 endpoint berbeda (dashboard dan dashboard2)</li>
+                <li>Implementasi conditional data loading berdasarkan role dan id_satdik</li>
+                <li>Format currency untuk tampilan Rupiah</li>
+                <li>Calculate progress percentage (keuangan dan fisik)</li>
+                <li>Responsive design untuk mobile dan desktop</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React hooks (useState, useEffect, useCallback), Axios, JWT Decode, Card Components, Badge Components
+            </div>
+
+            <div class="implementation-detail">
+                <strong>Detail Statistik Card:</strong>
+                <ul>
+                    <li>Pagu Total (total_anggaran)</li>
+                    <li>Total Paket (total_kegiatan)</li>
+                    <li>Pengadaan Barang (total_pengadaan_barang)</li>
+                    <li>Renovasi Gedung dan Bangunan (total_perbaikan)</li>
+                    <li>Pembangunan Gedung Baru (total_pembangunan_baru)</li>
+                    <li>Realisasi Keuangan (calculated)</li>
+                    <li>Progress Pengadaan Barang (%)</li>
+                    <li>Progress Renovasi Gedung (%)</li>
+                    <li>Progress Pembangunan Baru (%)</li>
+                    <li>Deviasi (total_anggaran - realisasi)</li>
+                    <li>Status Selesai (count)</li>
+                    <li>Status Proses (count)</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-high">Estimasi: 24-32 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Project Cards dengan Detail Kegiatan</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat card component untuk setiap project</li>
+                <li>Menampilkan list activities per project</li>
+                <li>Implementasi expand/collapse functionality</li>
+                <li>Tampilan desktop: tabel dengan 5 kolom</li>
+                <li>Tampilan mobile: card view dengan expand toggle</li>
+                <li>Progress tracking untuk setiap activity (keuangan & fisik)</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React useState untuk expand state, Card, Table, Badge, Button components
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 16-24 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Search & Filter Functionality</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi search bar untuk filter activities</li>
+                <li>Real-time search berdasarkan nama pekerjaan, PIC, dan kontraktor</li>
+                <li>Filter menggunakan useMemo untuk performance optimization</li>
+                <li>Display jumlah hasil pencarian</li>
+                <li>Clear search button (X icon)</li>
+                <li>Auto reset pagination saat search query berubah</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React useMemo, useState, Lucide React (Search, X icons)
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 8-12 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Pagination System</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi pagination untuk list activities (5 items per page)</li>
+                <li>Smart pagination dengan ellipsis untuk banyak halaman</li>
+                <li>Previous/Next navigation buttons</li>
+                <li>Direct page number selection</li>
+                <li>Different UI untuk desktop dan mobile</li>
+                <li>Show total items dan current range</li>
+            </ul>
+
+            <div class="implementation-detail">
+                <strong>Pagination Logic:</strong>
+                <ul>
+                    <li>Calculate total pages = Math.ceil(totalItems / itemsPerPage)</li>
+                    <li>Slice data untuk current page: data.slice(startIndex, endIndex)</li>
+                    <li>Smart ellipsis: show ...jika gap > 1 page</li>
+                    <li>Always show first and last page</li>
+                    <li>Show pages around current page (currentPage ± 1)</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 12-16 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>3. MODUL PERENCANAAN PENGADAAN</h2>
+
+    <div class="feature-module">
+        <h3>3.1 Halaman Perencanaan</h3>
+
+        <div class="feature-detail">
+            <h4>Data Table Perencanaan Multi-Kategori</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/perencanaan/page.tsx</div>
+            <div class="code-location">📁 src/component/page/kegiatan-pengadaan/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Fetch data dari 3 kategori berbeda secara parallel</li>
+                <li>Kategori 1: Pengadaan Barang</li>
+                <li>Kategori 2: Perbaikan Gedung dan Bangunan</li>
+                <li>Kategori 3: Pembangunan Gedung Baru</li>
+                <li>Implementasi dropdown Satdik untuk Admin Pusat</li>
+                <li>Auto-load data berdasarkan role dan id_satdik</li>
+                <li>Loading state dan error handling</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Promise.all untuk parallel fetch, Axios, useCallback, useEffect
+            </div>
+
+            <div class="workflow-box">
+                <strong>Data Loading Workflow:</strong>
+                <div class="workflow-step">Decode JWT token untuk get role dan id_unit_kerja</div>
+                <div class="workflow-step">Set IdSatdik berdasarkan role</div>
+                <div class="workflow-step">Fetch data dari 3 kategori menggunakan Promise.all</div>
+                <div class="workflow-step">Update state dengan data yang di-fetch</div>
+                <div class="workflow-step">Render 3 section dengan table berbeda</div>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 16-20 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Data Table Components</h4>
+            <div class="code-location">📁 src/component/tabel/dataTable.tsx</div>
+            <div class="code-location">📁 src/component/tabel/dataTableRenovAndBangun.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat 2 variasi table: default (pengadaan) dan renovasi/pembangunan</li>
+                <li>Implementasi TanStack Table untuk advanced table features</li>
+                <li>Sortable columns</li>
+                <li>Column filtering</li>
+                <li>Row selection (optional)</li>
+                <li>Action buttons (View, Edit, Delete)</li>
+                <li>Responsive table design</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> TanStack React Table (8.21.3), Table UI components
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-high">Estimasi: 20-28 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Identifikasi Pagu Anggaran</h4>
+            <div class="code-location">📁 src/component/tabel/tableDataIdentifikasiPagu.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat table khusus untuk identifikasi pagu</li>
+                <li>Menampilkan summary pagu per kategori</li>
+                <li>Calculate total pagu keseluruhan</li>
+                <li>Format currency display</li>
+            </ul>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 6-8 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Form Tambah Perencanaan</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/perencanaan/tambah/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat form input untuk perencanaan baru</li>
+                <li>Multiple input fields (nama kegiatan, kategori, pagu, dll)</li>
+                <li>Validasi form menggunakan React Hook Form</li>
+                <li>Dropdown untuk kategori pengadaan</li>
+                <li>Input dengan format Rupiah untuk anggaran</li>
+                <li>Submit data ke backend API</li>
+                <li>Success/error notification dengan Sonner</li>
+                <li>Redirect ke list setelah sukses</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React Hook Form (7.62.0), Sonner toast, Input/Select components, Axios
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 12-16 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Form Edit Perencanaan</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/perencanaan/edit/[id]/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Dynamic route dengan parameter [id]</li>
+                <li>Fetch existing data by ID</li>
+                <li>Pre-fill form dengan data existing</li>
+                <li>Edit dan update data</li>
+                <li>PUT/PATCH request ke backend</li>
+                <li>Validation dan error handling</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Next.js Dynamic Routes, React Hook Form, Axios
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 10-14 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>4. MODUL PELAKSANAAN PENGADAAN</h2>
+
+    <div class="feature-module">
+        <h3>4.1 Halaman Pelaksanaan</h3>
+
+        <div class="feature-detail">
+            <h4>Pelaksanaan Page (Dalam Pengembangan)</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/pelaksanaan/page.tsx</div>
+
+            <p><strong>Status:</strong> Halaman ini masih dalam pengembangan</p>
+            <p><strong>Rencana Fitur:</strong></p>
+            <ul>
+                <li>List semua kegiatan yang sedang dalam pelaksanaan</li>
+                <li>Filter berdasarkan status pelaksanaan</li>
+                <li>View detail pelaksanaan per kegiatan</li>
+                <li>Update progress keuangan dan fisik</li>
+            </ul>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High (Planned)</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Form Tambah Pelaksanaan</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/pelaksanaan/tambah/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Form untuk input data pelaksanaan baru</li>
+                <li>Fields: Satdik, Nama Pekerjaan, Kategori, Metode Pemilihan, dll</li>
+                <li>Fields: Nama Penyedia, NPWP, Alamat Penyedia</li>
+                <li>Fields: No Kontrak, Tanggal Kontrak, Nilai Kontrak</li>
+                <li>Input anggaran, HPS, nilai kontrak dengan format Rupiah</li>
+                <li>Auto-calculate sisa pagu (anggaran - nilai kontrak)</li>
+                <li>Select dropdown untuk status pekerjaan</li>
+                <li>Link CCTV input</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React Hook Form Controller untuk format currency, Input/Select/Textarea components
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-high">Estimasi: 20-24 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Detail Pelaksanaan (Barang/Jasa)</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan/[id]/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Halaman detail untuk pelaksanaan pengadaan barang/jasa</li>
+                <li>Display semua informasi pelaksanaan</li>
+                <li>View mode dan Edit mode toggle</li>
+                <li>Form pengawasan terintegrasi</li>
+                <li>Link ke CCTV monitoring</li>
+                <li>Progress tracking visual</li>
+            </ul>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 12-16 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Detail Pelaksanaan Pembangunan</h4>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/pelaksanaan/detail-pelaksanaan-pembangunan/[id]/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Halaman khusus untuk pelaksanaan pembangunan/renovasi</li>
+                <li>Additional fields untuk data bangunan</li>
+                <li>Progress fisik tracking lebih detail</li>
+                <li>Photo documentation upload (planned)</li>
+                <li>Laporan mingguan integration</li>
+            </ul>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 16-20 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Laporan Mingguan</h4>
+            <div class="code-location">📁 src/component/tabel/TableLaporanMingguan.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Table untuk menampilkan progress mingguan</li>
+                <li>Input progress per minggu</li>
+                <li>Calculate cumulative progress</li>
+                <li>Visual progress chart</li>
+                <li>Export laporan mingguan</li>
+            </ul>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 10-14 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>5. MODUL PENGAWASAN & MONITORING</h2>
+
+    <div class="feature-module">
+        <h3>5.1 Form Pengawasan</h3>
+
+        <div class="feature-detail">
+            <h4>Form Input & Update Pengawasan</h4>
+            <div class="code-location">📁 src/component/form/form-pengawasan.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Form comprehensive untuk update data pelaksanaan</li>
+                <li>Read-only fields untuk info basic (Satdik, Nama Pekerjaan)</li>
+                <li>Editable fields dengan toggle edit mode</li>
+                <li>Fields: Metode Pemilihan, Lokasi Kerja, Nama Penyedia, NPWP, Alamat</li>
+                <li>Fields: No Kontrak, Tanggal Kontrak, Status Pekerjaan</li>
+                <li>Currency inputs dengan React Hook Form Controller</li>
+                <li>Auto-calculate sisa pagu dari anggaran dan nilai kontrak</li>
+                <li>Dropdown status pekerjaan dengan 5 opsi</li>
+                <li>Link button ke CCTV monitoring</li>
+                <li>PUT request untuk update data</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React Hook Form (register, Controller, watch), Axios, Input/Textarea/Select components, Button with Link
+            </div>
+
+            <div class="implementation-detail">
+                <strong>Status Pekerjaan Options:</strong>
+                <ul>
+                    <li>Belum Tender</li>
+                    <li>Proses Tender</li>
+                    <li>Selesai Tender</li>
+                    <li>Pelaksanaan Kontrak</li>
+                    <li>Selesai (BAST)</li>
+                </ul>
+            </div>
+
+            <div class="implementation-detail">
+                <strong>Currency Format Implementation:</strong>
+                <ul>
+                    <li>Display: Rp 1.000.000 (formatted)</li>
+                    <li>Store: 1000000 (raw number)</li>
+                    <li>OnChange: remove non-numeric, convert to number</li>
+                    <li>Applied to: Anggaran, HPS, Nilai Kontrak fields</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-high">Estimasi: 18-24 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>View/Edit Mode Toggle</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi state untuk toggle between view dan edit mode</li>
+                <li>Conditional readOnly attribute pada input fields</li>
+                <li>Show/hide tombol Simpan dan Batal berdasarkan mode</li>
+                <li>Gray background untuk read-only fields (bg-gray-50)</li>
+                <li>OnCancel: reset form dan kembali ke view mode</li>
+            </ul>
+
+            <span class="complexity-badge complexity-low">Kompleksitas: Low</span>
+            <span class="complexity-badge complexity-low">Estimasi: 4-6 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>6. FITUR CCTV LIVE STREAMING</h2>
+
+    <div class="feature-module">
+        <h3>6.1 CCTV Monitoring</h3>
+
+        <div class="feature-detail">
+            <h4>Live Stream Player</h4>
+            <div class="code-location">📁 src/component/live-stream/index.tsx</div>
+            <div class="code-location">📁 src/app/kegiatan-pengadaan/pelaksanaan/cctv/[id]/page.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi HLS (HTTP Live Streaming) player</li>
+                <li>Video player dengan full controls</li>
+                <li>Support untuk .m3u8 playlist format</li>
+                <li>Proxy API untuk bypass CORS issues</li>
+                <li>Responsive video player</li>
+                <li>Auto-cleanup on component unmount</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> HLS.js (1.6.13), React useRef, useEffect, Video HTML5 element
+            </div>
+
+            <div class="workflow-box">
+                <strong>CCTV Streaming Workflow:</strong>
+                <div class="workflow-step">User klik "View CCTV" dari form pengawasan</div>
+                <div class="workflow-step">Navigate ke /kegiatan-pengadaan/pelaksanaan/cctv/[id]</div>
+                <div class="workflow-step">Component load playlist URL dari props</div>
+                <div class="workflow-step">Create proxy URL: /api/proxy?url=encodeURIComponent(playlistUrl)</div>
+                <div class="workflow-step">Initialize HLS.js instance</div>
+                <div class="workflow-step">hls.loadSource(proxyUrl)</div>
+                <div class="workflow-step">hls.attachMedia(videoElement)</div>
+                <div class="workflow-step">Listen MANIFEST_PARSED event</div>
+                <div class="workflow-step">Video ready to play (manual play oleh user)</div>
+                <div class="workflow-step">On unmount: hls.destroy()</div>
+            </div>
+
+            <div class="implementation-detail">
+                <strong>HLS.js Implementation Details:</strong>
+                <ul>
+                    <li>Check if browser supports MediaSource natively</li>
+                    <li>If not, use HLS.js polyfill</li>
+                    <li>Load M3U8 playlist through proxy</li>
+                    <li>Auto-select quality based on bandwidth</li>
+                    <li>Adaptive bitrate streaming</li>
+                    <li>Error recovery mechanism</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-high">Kompleksitas: High</span>
+            <span class="complexity-badge complexity-high">Estimasi: 20-28 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>API Proxy untuk CORS</h4>
+            <div class="code-location">📁 src/app/api/proxy/route.ts</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat API route untuk proxy external CCTV stream</li>
+                <li>Handle CORS headers</li>
+                <li>Forward request ke external CCTV server</li>
+                <li>Return stream response ke client</li>
+                <li>Error handling untuk connection issues</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Next.js API Routes, HTTP fetch/axios
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 8-12 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>7. FITUR EXPORT DATA</h2>
+
+    <div class="feature-module">
+        <h3>7.1 Export ke Excel</h3>
+
+        <div class="feature-detail">
+            <h4>Export Data Table ke Excel</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Implementasi fungsi export data ke format .xlsx</li>
+                <li>Generate Excel dari data table</li>
+                <li>Format columns dan headers</li>
+                <li>Apply styling ke Excel (bold headers, borders)</li>
+                <li>Auto-width columns</li>
+                <li>Currency formatting untuk kolom anggaran</li>
+                <li>Save file dengan file-saver</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> ExcelJS (4.4.0), file-saver (2.0.5)
+            </div>
+
+            <div class="implementation-detail">
+                <strong>ExcelJS Implementation:</strong>
+                <ul>
+                    <li>Create new Workbook</li>
+                    <li>Add worksheet dengan nama</li>
+                    <li>Define columns dengan headers dan keys</li>
+                    <li>Add rows dari data array</li>
+                    <li>Apply cell styles (font, border, fill)</li>
+                    <li>Set column widths</li>
+                    <li>Generate buffer dan save dengan FileSaver</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 10-14 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Export Button Integration</h4>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Tambah button "Export to Excel" di dashboard cards</li>
+                <li>OnClick trigger export function</li>
+                <li>Loading state saat generate Excel</li>
+                <li>Success notification setelah download</li>
+                <li>Error handling jika export gagal</li>
+            </ul>
+
+            <span class="complexity-badge complexity-low">Kompleksitas: Low</span>
+            <span class="complexity-badge complexity-low">Estimasi: 4-6 jam</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>8. KOMPONEN UI & USER EXPERIENCE</h2>
+
+    <div class="feature-module">
+        <h3>8.1 Layout & Navigation</h3>
+
+        <div class="feature-detail">
+            <h4>Main Layout Component</h4>
+            <div class="code-location">📁 src/component/layout/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Membuat main layout wrapper untuk semua halaman</li>
+                <li>Integrate Header component</li>
+                <li>Integrate Sidebar component</li>
+                <li>Content area dengan proper spacing</li>
+                <li>Responsive layout untuk mobile</li>
+                <li>Sidebar toggle untuk mobile view</li>
+            </ul>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 8-12 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Sidebar Navigation</h4>
+            <div class="code-location">📁 src/component/sidebar/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Sidebar dengan menu navigation</li>
+                <li>Nested menu dengan accordion (Kegiatan Pengadaan)</li>
+                <li>Active state untuk current page</li>
+                <li>Icons dari Lucide React</li>
+                <li>Auto-close sidebar after menu click (mobile)</li>
+                <li>Slide animation untuk open/close</li>
+                <li>Click outside to close (ClickOutside utility)</li>
+                <li>Logout button di bottom</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> React useState, Lucide React icons, ClickOutside component, Next.js Link
+            </div>
+
+            <div class="implementation-detail">
+                <strong>Menu Structure:</strong>
+                <ul>
+                    <li>Dashboard (icon: Home)</li>
+                    <li>Kegiatan Pengadaan (icon: User, expandable)
+                        <ul>
+                            <li>→ Perencanaan</li>
+                            <li>→ Pelaksanaan</li>
+                        </ul>
+                    </li>
+                    <li>Logout (icon: LogOut, type: danger)</li>
+                </ul>
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-medium">Estimasi: 12-16 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Header Component</h4>
+            <div class="code-location">📁 src/component/header/index.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Header bar dengan logo/title</li>
+                <li>User info display (nama, role)</li>
+                <li>Hamburger menu button untuk toggle sidebar (mobile)</li>
+                <li>Sticky header on scroll (optional)</li>
+            </ul>
+
+            <span class="complexity-badge complexity-low">Kompleksitas: Low</span>
+            <span class="complexity-badge complexity-low">Estimasi: 6-8 jam</span>
+        </div>
+
+        <div class="feature-detail">
+            <h4>Satdik Dropdown</h4>
+            <div class="code-location">📁 src/component/dropdown/satdikDropdown.tsx</div>
+
+            <p><strong>Deskripsi Pekerjaan:</strong></p>
+            <ul>
+                <li>Dropdown component untuk select Satuan Kerja</li>
+                <li>Fetch list Satdik dari API</li>
+                <li>Controlled component dengan props callback</li>
+                <li>Show untuk Admin Pusat only</li>
+                <li>OnChange trigger data reload</li>
+            </ul>
+
+            <div class="tech-used">
+                <strong>Teknologi:</strong> Radix UI Select, Axios
+            </div>
+
+            <span class="complexity-badge complexity-medium">Kompleksitas: Medium</span>
+            <span class="complexity-badge complexity-low">Estimasi: 8-10 jam</span>
+        </div>
+    </div>
+
+    <div class="feature-module">
+        <h3>8.2 Reusable UI Components (Shadcn/UI)</h3>
+
+        <p><strong>Deskripsi Pekerjaan:</strong> Implementasi komponen UI reusable menggunakan Radix UI + Tailwind CSS</p>
+
+        <table>
+            <tr>
+                <th>Komponen</th>
+                <th>File Location</th>
+                <th>Fitur Utama</th>
+                <th>Kompleksitas</th>
+            </tr>
+            <tr>
+                <td>Button</td>
+                <td>src/components/ui/button.tsx</td>
+                <td>Multiple variants, sizes, disabled state</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Input</td>
+                <td>src/components/ui/input.tsx</td>
+                <td>Text input dengan styling, validation states</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Textarea</td>
+                <td>src/components/ui/textarea.tsx</td>
+                <td>Multi-line input</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Select</td>
+                <td>src/components/ui/select.tsx</td>
+                <td>Dropdown dengan Radix UI, searchable</td>
+                <td class="complexity-badge complexity-medium">Medium</td>
+            </tr>
+            <tr>
+                <td>Dialog</td>
+                <td>src/components/ui/dialog.tsx</td>
+                <td>Modal dengan backdrop, close button</td>
+                <td class="complexity-badge complexity-medium">Medium</td>
+            </tr>
+            <tr>
+                <td>Alert Dialog</td>
+                <td>src/components/ui/alert-dialog.tsx</td>
+                <td>Confirmation dialog untuk aksi kritis</td>
+                <td class="complexity-badge complexity-medium">Medium</td>
+            </tr>
+            <tr>
+                <td>Card</td>
+                <td>src/components/ui/card.tsx</td>
+                <td>Container dengan header, content, footer</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Badge</td>
+                <td>src/components/ui/badge.tsx</td>
+                <td>Status indicators dengan warna variants</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Table</td>
+                <td>src/components/ui/table.tsx</td>
+                <td>Table elements dengan styling</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+            <tr>
+                <td>Accordion</td>
+                <td>src/components/ui/accordion.tsx</td>
+                <td>Collapsible sections dengan Radix UI</td>
+                <td class="complexity-badge complexity-medium">Medium</td>
+            </tr>
+            <tr>
+                <td>Drawer</td>
+                <td>src/components/ui/drawer.tsx</td>
+                <td>Slide-in panel untuk mobile (Vaul)</td>
+                <td class="complexity-badge complexity-medium">Medium</td>
+            </tr>
+            <tr>
+                <td>Sonner (Toast)</td>
+                <td>src/components/ui/sonner.tsx</td>
+                <td>Toast notifications</td>
+                <td class="complexity-badge complexity-low">Low</td>
+            </tr>
+        </table>
+
+        <div class="implementation-detail">
+            <strong>Total Estimasi UI Components:</strong> 60-80 jam untuk semua komponen
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>9. RINGKASAN KOMPLEKSITAS PEKERJAAN</h2>
+
+    <h3>9.1 Breakdown by Module</h3>
+
+    <table>
+        <tr>
+            <th>Modul</th>
+            <th>Jumlah Fitur</th>
+            <th>Kompleksitas Rata-rata</th>
+            <th>Estimasi Total (Jam)</th>
+        </tr>
+        <tr>
+            <td>Autentikasi & Otorisasi</td>
+            <td>4 fitur</td>
+            <td>Medium-High</td>
+            <td>44-60 jam</td>
+        </tr>
+        <tr>
+            <td>Dashboard & Visualisasi</td>
+            <td>4 fitur</td>
+            <td>High</td>
+            <td>60-84 jam</td>
+        </tr>
+        <tr>
+            <td>Perencanaan Pengadaan</td>
+            <td>5 fitur</td>
+            <td>Medium-High</td>
+            <td>64-86 jam</td>
+        </tr>
+        <tr>
+            <td>Pelaksanaan Pengadaan</td>
+            <td>5 fitur</td>
+            <td>Medium-High</td>
+            <td>68-88 jam</td>
+        </tr>
+        <tr>
+            <td>Pengawasan & Monitoring</td>
+            <td>2 fitur</td>
+            <td>Medium-High</td>
+            <td>22-30 jam</td>
+        </tr>
+        <tr>
+            <td>CCTV Live Streaming</td>
+            <td>2 fitur</td>
+            <td>High</td>
+            <td>28-40 jam</td>
+        </tr>
+        <tr>
+            <td>Export Data</td>
+            <td>2 fitur</td>
+            <td>Medium</td>
+            <td>14-20 jam</td>
+        </tr>
+        <tr>
+            <td>UI Components & Layout</td>
+            <td>16 komponen</td>
+            <td>Low-Medium</td>
+            <td>94-122 jam</td>
+        </tr>
+        <tr>
+            <td><strong>TOTAL</strong></td>
+            <td><strong>40+ fitur</strong></td>
+            <td><strong>Medium-High</strong></td>
+            <td><strong>394-530 jam</strong></td>
+        </tr>
+    </table>
+
+    <h3>9.2 Estimasi Waktu Pengerjaan</h3>
+
+    <table>
+        <tr>
+            <th>Skenario</th>
+            <th>Jam/Hari</th>
+            <th>Total Hari Kerja</th>
+            <th>Total Minggu</th>
+        </tr>
+        <tr>
+            <td>1 Developer Full-time (8 jam/hari)</td>
+            <td>8</td>
+            <td>49-66 hari</td>
+            <td>10-13 minggu (2.5-3 bulan)</td>
+        </tr>
+        <tr>
+            <td>2 Developers Full-time</td>
+            <td>16</td>
+            <td>25-33 hari</td>
+            <td>5-7 minggu (1.5-2 bulan)</td>
+        </tr>
+        <tr>
+            <td>3 Developers Full-time</td>
+            <td>24</td>
+            <td>16-22 hari</td>
+            <td>3.5-4.5 minggu (1-1.5 bulan)</td>
+        </tr>
+    </table>
+
+    <h3>9.3 Fitur-fitur dengan Kompleksitas Tertinggi</h3>
+
+    <ol>
+        <li><strong>CCTV Live Streaming (28-40 jam)</strong> - HLS.js implementation, proxy API, error handling</li>
+        <li><strong>Dashboard dengan Visualisasi Data (24-32 jam)</strong> - Multiple API calls, real-time data, responsive cards</li>
+        <li><strong>Data Table dengan TanStack Table (20-28 jam)</strong> - Sortable, filterable, responsive tables</li>
+        <li><strong>Form Tambah Pelaksanaan (20-24 jam)</strong> - Complex form dengan banyak fields dan validations</li>
+        <li><strong>JWT Token & RBAC (16-20 jam)</strong> - Security implementation, role-based rendering</li>
+        <li><strong>Form Pengawasan (18-24 jam)</strong> - Conditional fields, currency formatting, auto-calculations</li>
+    </ol>
+
+    <h3>9.4 Teknologi Kunci yang Digunakan</h3>
+
+    <ul>
+        <li><strong>Next.js 15.5.3</strong> - App Router, API Routes, SSR</li>
+        <li><strong>React 19.1.0</strong> - Hooks (useState, useEffect, useCallback, useMemo)</li>
+        <li><strong>TypeScript 5.x</strong> - Type safety untuk semua components</li>
+        <li><strong>React Hook Form 7.62.0</strong> - Form management dengan validasi</li>
+        <li><strong>TanStack Table 8.21.3</strong> - Advanced data tables</li>
+        <li><strong>HLS.js 1.6.13</strong> - HTTP Live Streaming untuk CCTV</li>
+        <li><strong>Chart.js 4.5.0</strong> - Data visualization (untuk future features)</li>
+        <li><strong>Axios 1.12.2</strong> - HTTP client untuk API calls</li>
+        <li><strong>ExcelJS 4.4.0</strong> - Excel generation</li>
+        <li><strong>Radix UI</strong> - Accessible UI components</li>
+        <li><strong>Tailwind CSS 4.x</strong> - Utility-first styling</li>
+    </ul>
+
+    <div class="footer">
+        <p><strong>Rincian Pekerjaan Fitur-Fitur Aplikasi E-Purchasing</strong></p>
+        <p>© 2024 E-Purchasing System (Proc750) - Version 0.1.0</p>
+        <p>Dokumen ini berisi detail implementasi teknis untuk setiap fitur aplikasi</p>
+    </div>
+</body>
+</html>

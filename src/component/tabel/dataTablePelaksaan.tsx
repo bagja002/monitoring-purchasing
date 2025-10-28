@@ -33,38 +33,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { PelaksaanKegiatan } from "../interface/pelaksaanInterface";
 
 // Interface untuk data perencanaan kegiatan
-export interface PengawasanKegiatan {
-  id_perencanaan_kegiatan: string | number;
-  satdik: string;
-  nama_pekerjaan: string;
-  metode_pengadaan: string;
-  lokasi_pekerjaan: string;
-  link_cctv: string;
-  informasi_penyedia: string;
-  no_tanggal_kontrak: string;
-  no_tanggal_kontrak_berakhir: string;
-  lama_pekerjaan: number;
-  status_pekerjaan: string;
-  anggaran: number;
-  hps: number;
-  nilai_kontrak: number;
-  sisa_pagu: number;
-  target_fisik: number;
-  realisasi_fisik: number;
-  deviasi: number;
-  target_realisasi_anggaran_termin: number;
-  realisasi_termin: number;
-  sisa_kontrak: number;
-  keeterangan: string;
-  tindak_lanjut_rekomendasi_sebelumnya: string;
-  permasalahan: string;
-  rekomendasi: string;
-}
 
 interface Props {
-  data: PengawasanKegiatan[];
+  data: PelaksaanKegiatan[];
 }
 
 const allColumns = (
@@ -72,7 +46,7 @@ const allColumns = (
   onDelete: (id: string | number) => void,
   setNamaSatdik: (satdik: string) => void,
   setNamaPekerjaan: (pekerjaan: string) => void
-): ColumnDef<PengawasanKegiatan, any>[] => [
+): ColumnDef<PelaksaanKegiatan, any>[] => [
   {
     header: "No",
     cell: ({ row }) => row.index + 1,
@@ -86,7 +60,7 @@ const allColumns = (
           size="sm"
           onClick={() =>
             router.push(
-              `pengawasan/edit/${row.original.id_perencanaan_kegiatan}`
+              `pengawasan/edit/${row.original.id_pelaksanaan_pengadaan}`
             )
           }
         >
@@ -98,7 +72,7 @@ const allColumns = (
           onClick={() => {
             setNamaSatdik(row.original.satdik);
             setNamaPekerjaan(row.original.nama_pekerjaan);
-            onDelete(row.original.id_perencanaan_kegiatan);
+            onDelete(row.original.id_pelaksanaan_pengadaan);
           }}
         >
           Delete
@@ -125,6 +99,19 @@ const allColumns = (
   {
     accessorKey: "link_cctv",
     header: "Link CCTV",
+    cell: ({ row }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() =>
+          router.push(
+            `/kegiatan-pengadaan/pengawasan/cctv/${row.original.id_pelaksanaan_pengadaan}`
+          )
+        }
+      >
+        View
+      </Button>
+    ),
   },
   {
     accessorKey: "informasi_penyedia",
@@ -189,59 +176,35 @@ const allColumns = (
   },
   {
     header: "Target Realisasi Fisik (%)",
-    columns: [
-      {
-        accessorKey: "target_fisik",
-        header: "Target Fisik Per Minggu",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-      {
-        accessorKey: "realisasi_fisik",
-        header: "Realisasi Fisik Per Minggu",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-      {
-        accessorKey: "deviasi",
-        header: "Deviasi",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-    ],
+    cell: ({ row }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() =>
+          router.push(
+            `/kegiatan-pengadaan/pengawasan/realisasi-fisik/${row.original.id_pelaksanaan_pengadaan}`
+          )
+        }
+      >
+        View Detail
+      </Button>
+    ),
   },
   {
     header: "Target dan Realisasi Anggaran",
-    columns: [
-      {
-        accessorKey: "target_realisasi_anggaran_termin",
-        header: "Target Per Termin",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-      {
-        accessorKey: "realisasi_termin",
-        header: "Realisasi Fisik Per Termin",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-      {
-        accessorKey: "sisa_kontrak",
-        header: "Sisa Kontrak",
-        cell: (info) => `${info.getValue<number>()} %`,
-      },
-    ],
-  },
-  {
-    accessorKey: "keeterangan",
-    header: "Keterangan",
-  },
-  {
-    accessorKey: "tindak_lanjut_rekomendasi_sebelumnya",
-    header: "Tindak Lanjut Rekomendasi Sebelumnya",
-  },
-  {
-    accessorKey: "permasalahan",
-    header: "Permasalahan",
-  },
-  {
-    accessorKey: "rekomendasi",
-    header: "Rekomendasi",
+    cell: ({ row }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() =>
+          router.push(
+            `/kegiatan-pengadaan/pengawasan/realisasi-anggaran/${row.original.id_pelaksanaan_pengadaan}`
+          )
+        }
+      >
+        View Detail
+      </Button>
+    ),
   },
 ];
 
@@ -318,6 +281,41 @@ export default function DataTablePelaksaan({ data }: Props) {
     }
   };
 
+  // Fungsi untuk menghitung merge cell
+  const calculateMergedCells = () => {
+    const rows = table.getRowModel().rows;
+    const mergeInfo: Record<number, { satdik: number; namaPekerjaan: number }> = {};
+
+    let i = 0;
+    while (i < rows.length) {
+      const currentRow = rows[i].original;
+      let mergeCount = 1;
+
+      // Hitung berapa banyak row berikutnya yang memiliki satdik dan nama_pekerjaan yang sama
+      while (
+        i + mergeCount < rows.length &&
+        rows[i + mergeCount].original.satdik === currentRow.satdik &&
+        rows[i + mergeCount].original.nama_pekerjaan === currentRow.nama_pekerjaan
+      ) {
+        mergeCount++;
+      }
+
+      // Set merge info untuk row pertama
+      mergeInfo[i] = { satdik: mergeCount, namaPekerjaan: mergeCount };
+
+      // Set merge info untuk row berikutnya dalam grup (akan di-hide)
+      for (let j = 1; j < mergeCount; j++) {
+        mergeInfo[i + j] = { satdik: 0, namaPekerjaan: 0 };
+      }
+
+      i += mergeCount;
+    }
+
+    return mergeInfo;
+  };
+
+  const mergedCells = calculateMergedCells();
+
   return (
     <div className="space-y-4 max-w-[97vw] overflow-x-auto">
       {/* Search */}
@@ -357,13 +355,51 @@ export default function DataTablePelaksaan({ data }: Props) {
 
         <TableBody>
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row, rowIndex) => (
               <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="border px-2 py-1 text-sm">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  const columnId = cell.column.id;
+                  const mergeInfo = mergedCells[rowIndex];
+
+                  // Handle merge untuk kolom satdik
+                  if (columnId === "satdik") {
+                    if (mergeInfo.satdik === 0) {
+                      return null; // Skip cell ini karena sudah di-merge ke atas
+                    }
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className="border px-2 py-1 text-sm align-middle"
+                        rowSpan={mergeInfo.satdik}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  }
+
+                  // Handle merge untuk kolom nama_pekerjaan
+                  if (columnId === "nama_pekerjaan") {
+                    if (mergeInfo.namaPekerjaan === 0) {
+                      return null; // Skip cell ini karena sudah di-merge ke atas
+                    }
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className="border px-2 py-1 text-sm align-middle"
+                        rowSpan={mergeInfo.namaPekerjaan}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  }
+
+                  // Render cell biasa untuk kolom lain
+                  return (
+                    <TableCell key={cell.id} className="border px-2 py-1 text-sm">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))
           ) : (

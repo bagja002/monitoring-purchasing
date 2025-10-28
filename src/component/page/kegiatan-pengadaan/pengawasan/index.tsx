@@ -8,13 +8,9 @@ import { jwtDecode } from "jwt-decode";
 
 import Mainlayout from "@/component/layout";
 import SelectSatdik from "@/component/dropdown/satdikDropdown";
-import DataTable from "@/component/tabel/dataTable";
-import DataTablePembangunanRenovasi from "@/component/tabel/dataTableRenovAndBangun";
-import PaguAwal from "@/component/tabel/tableDataIdentifikasiPagu";
-import { PerencanaanKegiatanReal } from "@/component/interface/dataReal";
-import DataTablePelaksaan, {
-  PengawasanKegiatan,
-} from "@/component/tabel/dataTablePelaksaan";
+
+import { PelaksaanKegiatan } from "@/component/interface/pelaksaanInterface";
+import DataTablePelaksaan from "@/component/tabel/dataTablePelaksaan";
 
 interface DecodedToken {
   exp: number;
@@ -24,90 +20,6 @@ interface DecodedToken {
   role: string;
   type: string;
 }
-
-const dummyPelaksanaan: PengawasanKegiatan[] = [
-  {
-    id_perencanaan_kegiatan: 1,
-    satdik: "SMP Negeri 1 Jakarta",
-    nama_pekerjaan: "Renovasi Gedung Kelas",
-    metode_pengadaan: "Tender",
-    lokasi_pekerjaan: "Jakarta Selatan",
-    link_cctv: "http://cctv.example.com/1",
-    informasi_penyedia: "PT Maju Jaya",
-    no_tanggal_kontrak: "001/SPK/2025 - 01/01/2025",
-    no_tanggal_kontrak_berakhir: "001/SPK/2025 - 30/06/2025",
-    lama_pekerjaan: 180,
-    status_pekerjaan: "Berjalan",
-    anggaran: 500000000,
-    hps: 480000000,
-    nilai_kontrak: 470000000,
-    sisa_pagu: 30000000,
-    target_fisik: 50,
-    realisasi_fisik: 45,
-    deviasi: -5,
-    target_realisasi_anggaran_termin: 60,
-    realisasi_termin: 55,
-    sisa_kontrak: 45,
-    keeterangan: "Progress sesuai jadwal",
-    tindak_lanjut_rekomendasi_sebelumnya: "Sudah diperbaiki",
-    permasalahan: "Keterlambatan material",
-    rekomendasi: "Percepat distribusi material",
-  },
-  {
-    id_perencanaan_kegiatan: 2,
-    satdik: "SMA Negeri 5 Bandung",
-    nama_pekerjaan: "Pembangunan Lapangan Olahraga",
-    metode_pengadaan: "E-Purchasing",
-    lokasi_pekerjaan: "Bandung",
-    link_cctv: "http://cctv.example.com/2",
-    informasi_penyedia: "CV Sportindo",
-    no_tanggal_kontrak: "002/SPK/2025 - 05/02/2025",
-    no_tanggal_kontrak_berakhir: "002/SPK/2025 - 31/07/2025",
-    lama_pekerjaan: 150,
-    status_pekerjaan: "Baru Mulai",
-    anggaran: 300000000,
-    hps: 290000000,
-    nilai_kontrak: 285000000,
-    sisa_pagu: 15000000,
-    target_fisik: 20,
-    realisasi_fisik: 10,
-    deviasi: -10,
-    target_realisasi_anggaran_termin: 25,
-    realisasi_termin: 15,
-    sisa_kontrak: 85,
-    keeterangan: "Baru tahap persiapan",
-    tindak_lanjut_rekomendasi_sebelumnya: "-",
-    permasalahan: "Belum ada masalah",
-    rekomendasi: "Monitor progress lebih ketat",
-  },
-  {
-    id_perencanaan_kegiatan: 3,
-    satdik: "SMK Negeri 2 Surabaya",
-    nama_pekerjaan: "Pengadaan Peralatan Praktikum",
-    metode_pengadaan: "Penunjukan Langsung",
-    lokasi_pekerjaan: "Surabaya",
-    link_cctv: "http://cctv.example.com/3",
-    informasi_penyedia: "PT Teknologi Nusantara",
-    no_tanggal_kontrak: "003/SPK/2025 - 10/03/2025",
-    no_tanggal_kontrak_berakhir: "003/SPK/2025 - 30/08/2025",
-    lama_pekerjaan: 120,
-    status_pekerjaan: "Selesai",
-    anggaran: 200000000,
-    hps: 190000000,
-    nilai_kontrak: 185000000,
-    sisa_pagu: 15000000,
-    target_fisik: 100,
-    realisasi_fisik: 100,
-    deviasi: 0,
-    target_realisasi_anggaran_termin: 100,
-    realisasi_termin: 100,
-    sisa_kontrak: 0,
-    keeterangan: "Pekerjaan sudah selesai",
-    tindak_lanjut_rekomendasi_sebelumnya: "Sesuai rekomendasi",
-    permasalahan: "Tidak ada",
-    rekomendasi: "Good job",
-  },
-];
 
 type KategoriKey = "pengadaan" | "revitalisasi" | "pembangunan";
 
@@ -141,9 +53,7 @@ export default function KegiatanPelaksananPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [data, setData] = useState<
-    Record<KategoriKey, PerencanaanKegiatanReal[]>
-  >({
+  const [data, setData] = useState<Record<KategoriKey, PelaksaanKegiatan[]>>({
     pengadaan: [],
     revitalisasi: [],
     pembangunan: [],
@@ -164,18 +74,20 @@ export default function KegiatanPelaksananPage() {
     }
   }, []);
 
-  const fetchDataByKategori = useCallback(
+  const fetchData = useCallback(
     async (kategori: string, selectedSatdikId: number) => {
-      const baseUrl = `${BASE_URL}/operator/getRencanaPengadaan`;
-      let queryParams = `kategory=${kategori}`;
+      const baseUrl = `${BASE_URL}/getPelaksanaanKegiatan`;
+      let queryParams = ``;
 
       if (selectedSatdikId && selectedSatdikId !== 0) {
-        queryParams += `&id_satdik=${selectedSatdikId}`;
+        queryParams += `id_satdik=${selectedSatdikId}`;
       }
 
-      const finalUrl = `${baseUrl}?${queryParams}`;
-      const response = await axios.get<PerencanaanKegiatanReal[]>(finalUrl);
-      return response.data;
+      const finalUrl = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
+      console.log("Fetching URL:", finalUrl);
+      const response = await axios.get(finalUrl);
+      console.log("Response data for", kategori, ":", response.data);
+      return response.data.data;
     },
     [BASE_URL]
   );
@@ -194,8 +106,8 @@ export default function KegiatanPelaksananPage() {
             (typeof kategoriConfig)[KategoriKey]
           ][]
         ).map(async ([key, cfg]) => {
-          const res = await fetchDataByKategori(cfg.query, IdSatdik);
-          return [key, res] as [KategoriKey, PerencanaanKegiatanReal[]];
+          const res = await fetchData(cfg.query, IdSatdik);
+          return [key, res] as [KategoriKey, PelaksaanKegiatan[]];
         })
       );
 
@@ -206,7 +118,7 @@ export default function KegiatanPelaksananPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchDataByKategori, IdSatdik]);
+  }, [fetchData, IdSatdik]);
 
   useEffect(() => {
     fetchAllData();
@@ -234,7 +146,7 @@ export default function KegiatanPelaksananPage() {
         {/* Pagu Awal */}
 
         {/* Button tambah */}
-        <div className="flex justify-start mb-4">
+        {/* <div className="flex justify-start mb-4">
           <button
             type="button"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -242,14 +154,55 @@ export default function KegiatanPelaksananPage() {
           >
             Tambahkan Pelaksanaan
           </button>
-        </div>
+        </div> */}
 
         {/* Loading & Error state */}
         {loading && <p className="text-gray-500">Loading data...</p>}
         {error && <p className="text-red-600">{error}</p>}
 
         {/* Data sections */}
-        <DataTablePelaksaan data={dummyPelaksanaan} />
+        {!loading && !error && (
+          <>
+            {/* Pengadaan Barang */}
+            {data.pengadaan.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 text-blue-700">
+                  Pengadaan Barang
+                </h2>
+                <DataTablePelaksaan data={data.pengadaan} />
+              </div>
+            )}
+
+            {/* Perbaikan Gedung dan Bangunan */}
+            {data.revitalisasi.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 text-green-700">
+                  Perbaikan Gedung dan Bangunan
+                </h2>
+                <DataTablePelaksaan data={data.revitalisasi} />
+              </div>
+            )}
+
+            {/* Pembangunan Gedung Baru */}
+            {data.pembangunan.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 text-purple-700">
+                  Pembangunan Gedung dan Bangunan Baru
+                </h2>
+                <DataTablePelaksaan data={data.pembangunan} />
+              </div>
+            )}
+
+            {/* Jika semua data kosong */}
+            {data.pengadaan.length === 0 &&
+              data.revitalisasi.length === 0 &&
+              data.pembangunan.length === 0 && (
+                <p className="text-gray-500 text-center py-8">
+                  Tidak ada data pelaksanaan kegiatan
+                </p>
+              )}
+          </>
+        )}
       </div>
     </Mainlayout>
   );
