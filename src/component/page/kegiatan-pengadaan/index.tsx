@@ -133,7 +133,7 @@ export default function KegiatanPengadaanPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchDataByKategori, IdSatdik, userRole]);
+  }, [fetchDataByKategori, IdSatdik]);
 
   // ✅ Jalan setiap IdSatdik atau userRole berubah
   useEffect(() => {

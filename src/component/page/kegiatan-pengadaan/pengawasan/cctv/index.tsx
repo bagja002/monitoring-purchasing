@@ -59,6 +59,28 @@ interface ApiResponse<T> {
   success?: boolean;
 }
 
+interface PerencanaanKegiatanLaporanData {
+  satdik: string;
+  nama_pekerjaan: string;
+  kategori_pengadaan: string;
+  anggaran: number;
+  hps: number;
+  id_pelaksanaan_pengadaan: string;
+  id_perencanaan_kegiatan: string;
+  lokasi_pekerjaan: string;
+  link_cctv: string;
+  nama_penyedia: string;
+  npwp: string;
+  alamat_penyedia: string;
+  no_tanggal_kontrak_spk: string;
+  tanggal_kontrak_berakhir: string;
+  lama_pekerjaan: number;
+  nilai_kontrak: number;
+  sisa_pagu: number;
+  metode_pemilihan: string;
+  status_pekerjaan: string;
+}
+
 // Utility Functions
 const sanitizeInput = (input: string): string => {
   // Hanya menghapus karakter berbahaya (<>), tetap mempertahankan spasi
@@ -145,7 +167,7 @@ class CCTVApiService {
     try {
       const response = await this.requestWithRetry(async () => {
         return await axiosInstance.get<ApiResponse<CCTVData[]>>(
-          `/cctv/getAll?id_pelaksanaan_pengadaan${idPengadaan}`
+          `/cctv/getAll?id_pelaksanaan_pengadaan=${idPengadaan}`
         );
       });
 
@@ -256,6 +278,39 @@ class CCTVApiService {
       throw new Error("Gagal menghapus data CCTV");
     }
   }
+
+  static async getPerencanaanKegiatanLaporan(
+    idPerencanaanKegiatan: number
+  ): Promise<PerencanaanKegiatanLaporanData[]> {
+    try {
+      const response = await this.requestWithRetry(async () => {
+        return await axiosInstance.get(
+          `/getPerencanaanKegiatanLaporan?id_perencanaan_kegiatan=${idPerencanaanKegiatan}`
+        );
+      });
+
+      console.log("respon Kegiatan", response);
+
+      const data = response.data.data;
+      return Array.isArray(data) ? data : data.data || [];
+    } catch (error) {
+      console.error("Error fetching Perencanaan Kegiatan Laporan:", error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          return []; // Return empty array jika tidak ada data
+        } else if (error.response) {
+          throw new Error(
+            `Gagal mengambil data laporan: ${error.response.status} ${error.response.statusText}`
+          );
+        } else if (error.code === "ECONNABORTED") {
+          throw new Error("Request timeout. Silakan coba lagi.");
+        } else {
+          throw new Error("Network error. Periksa koneksi internet Anda.");
+        }
+      }
+      throw new Error("Gagal mengambil data Perencanaan Kegiatan Laporan");
+    }
+  }
 }
 
 export default function PageCCTV() {
@@ -286,6 +341,25 @@ export default function PageCCTV() {
       : 0,
   });
   const [cctvData, setCctvData] = useState<CCTVData[]>([]);
+  const [laporanData, setLaporanData] =
+    useState<PerencanaanKegiatanLaporanData | null>(null);
+  console.log("laporan Data", laporanData);
+  // Fetch data laporan perencanaan kegiatan
+  const fetchLaporanData = useCallback(async () => {
+    if (!idPelaksanaanPengadaan) return;
+
+    try {
+      const id = parseInt(idPelaksanaanPengadaan);
+      const data = await CCTVApiService.getPerencanaanKegiatanLaporan(id);
+
+      if (data && data.length > 0) {
+        setLaporanData(data[0]); // Ambil data pertama
+      }
+    } catch (err) {
+      console.error("Error fetching laporan data:", err);
+      // Tidak perlu menampilkan error toast karena ini optional data
+    }
+  }, [idPelaksanaanPengadaan]);
 
   // Fetch data dengan error handling yang lebih baik
   const fetchCCTVData = useCallback(async () => {
@@ -318,7 +392,8 @@ export default function PageCCTV() {
 
   useEffect(() => {
     fetchCCTVData();
-  }, [fetchCCTVData]);
+    fetchLaporanData();
+  }, [fetchCCTVData, fetchLaporanData]);
 
   // Update formData ketika idPelaksanaanPengadaan berubah
   useEffect(() => {
@@ -480,11 +555,18 @@ export default function PageCCTV() {
             <h1 className="text-2xl font-bold">
               Monitoring CCTV Pelaksanaan Pekerjaan
             </h1>
-            {idPelaksanaanPengadaan && (
+            {laporanData ? (
+              <div className="mt-1">
+                <p className="text-sm text-gray-700 font-medium">
+                  {laporanData.nama_pekerjaan}
+                </p>
+                <p className="text-sm text-gray-500">di {laporanData.satdik}</p>
+              </div>
+            ) : idPelaksanaanPengadaan ? (
               <p className="text-sm text-gray-500 mt-1">
                 ID Pelaksanaan Pengadaan: {idPelaksanaanPengadaan}
               </p>
-            )}
+            ) : null}
           </div>
 
           <Dialog open={showForm} onOpenChange={setShowForm}>

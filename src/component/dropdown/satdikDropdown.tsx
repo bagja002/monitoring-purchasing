@@ -45,11 +45,11 @@ const SelectSatdik: React.FC<SelectSatdikProps> = ({ selectTedOption, idSatdik }
       setSelectedOption(idSatdik);
       const selected = staticSatdik.find((item) => item.ID === idSatdik);
       if (selected) {
-       
+
         setIsOptionSelected(true);
       }
     }
-  }, [idSatdik]);
+  }, [idSatdik, staticSatdik]);
 
   // Handle user change
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

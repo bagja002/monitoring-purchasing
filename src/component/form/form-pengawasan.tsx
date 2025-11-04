@@ -227,6 +227,15 @@ export function FormPengawasan({ data, isEdit, onSubmit, onCancel }: any) {
         </div>
 
         <div>
+          <Label className="mb-2">Lama Pekerjaan</Label>
+          <Input
+            readOnly={!isEdit}
+            {...register("lama_pekerjaan")}
+            className={!isEdit ? "bg-gray-50" : ""}
+          />
+        </div>
+
+        <div>
           <Label className="mb-2">Status Pekerjaan</Label>
           <select
             disabled={!isEdit}

@@ -50,7 +50,7 @@ export default function KegiatanPelaksananPage() {
 
   const [IdSatdik, setSelectedSatdikId] = useState<number>(0);
   const [userRole, setUserRole] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const [data, setData] = useState<Record<KategoriKey, PelaksaanKegiatan[]>>({
@@ -79,7 +79,14 @@ export default function KegiatanPelaksananPage() {
       const baseUrl = `${BASE_URL}/getPelaksanaanKegiatan`;
       let queryParams = ``;
 
-      if (selectedSatdikId && selectedSatdikId !== 0) {
+      // Add kategori parameter
+      if (kategori) {
+        queryParams += `kategori=${encodeURIComponent(kategori)}`;
+      }
+
+      // Add satdik parameter only if selected (not 0 or "all")
+      if (selectedSatdikId > 0) {
+        if (queryParams) queryParams += "&";
         queryParams += `id_satdik=${selectedSatdikId}`;
       }
 
@@ -87,17 +94,27 @@ export default function KegiatanPelaksananPage() {
       console.log("Fetching URL:", finalUrl);
       const response = await axios.get(finalUrl);
       console.log("Response data for", kategori, ":", response.data);
-      return response.data.data;
+      return response.data.data || [];
     },
     [BASE_URL]
   );
 
   const fetchAllData = useCallback(async () => {
-    if (!IdSatdik || IdSatdik === 0) return; // 🚀 skip kalau belum ada IdSatdik
+    // Skip if user role is not set yet (still loading)
+    if (!userRole) {
+      console.log("User role belum diset, skip fetch");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
+      console.log(
+        "Fetching data with IdSatdik:",
+        IdSatdik,
+        "and userRole:",
+        userRole
+      );
 
       const results = await Promise.all(
         (
@@ -111,14 +128,16 @@ export default function KegiatanPelaksananPage() {
         })
       );
 
-      setData(Object.fromEntries(results) as typeof data);
+      const fetchedData = Object.fromEntries(results) as typeof data;
+      console.log("Fetched data:", fetchedData);
+      setData(fetchedData);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Gagal memuat data kegiatan.");
     } finally {
       setLoading(false);
     }
-  }, [fetchData, IdSatdik]);
+  }, [fetchData, IdSatdik, userRole]);
 
   useEffect(() => {
     fetchAllData();
@@ -126,10 +145,6 @@ export default function KegiatanPelaksananPage() {
 
   const handleSatdikSelect = (id: number) => {
     setSelectedSatdikId(id);
-  };
-
-  const handleClick = () => {
-    router.push("/kegiatan-pengadaan/perencanaan/tambah");
   };
 
   return (
